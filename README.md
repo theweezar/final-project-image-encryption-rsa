@@ -14,5 +14,5 @@
 
 2. Back-end: Python 
 
-![Python](https://github.com/theweezar/final-project-image-encryption-rsa/blob/master/readme/python.jpeg)
+![Python](/readme/python.jpeg)
 
