@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navigator-width: 240px
+}
+
+body {
+  margin: 0;
+  font-family: 'Mulish', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.header {
+  height: 75px;
+}
+
+.body {
+  height: calc(100vh - 75px);
+}
+
+.navigator {
+  flex: 0 0 var(--navigator-width);
+  max-width: var(--navigator-width);
+}
+
+.main-container {
+  flex: 0 0 calc(100% - var(--navigator-width));
+  max-width: calc(100% - var(--navigator-width));
+}
