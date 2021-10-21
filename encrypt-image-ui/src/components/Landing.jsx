@@ -1,12 +1,9 @@
-import { Navigator } from "./Navigator";
-import { Main } from "./Main";
 
 export const Landing = () => {
   return (
     <div className="body">
-      <div className="flex flex-row h-full">
-        <Navigator />
-        <Main />
+      <div className="flex flex-row flex-wrap h-full">
+        
       </div>
     </div>
   );

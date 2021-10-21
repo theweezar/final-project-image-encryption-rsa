@@ -6,41 +6,28 @@ import { randomString } from "../scripts/randomHelpers";
 import { useState } from "react";
 
 export const Navigator = () => {
-  const [selected, setSelected] = useState(0);
+  const [pathname, setPathname] = useState(window.location.pathname);
 
   const links = [
-    {to: "/", icon: <AiOutlineHome />, text: "Landing"},
-    {to: "/keypair", icon: <BsKey />, text: "Keys"},
+    {pathname: "/", icon: <AiOutlineHome />, text: "Landing"},
+    {pathname: "/keypair", icon: <BsKey />, text: "Keys"},
   ];
 
-  const f =_.find(links, (link, index) => {
-    return link.to === window.location.pathname;
-  });
-
-  console.log(f);
-
   return (
-    <div className="navigator h-full">
-      <div className="w-full h-4/5 p-4 shadow rounded-lg">
-        <ul className="flex flex-col">
-          {_.map(links, (link, index) => {
-            return (
-              <li className="list-item" key={randomString(4)}>
-                <Link to={link.to} onClick={() => setSelected(index)}
-                className={"py-1.5 px-3.5 text-blue-600 flex items-center text-base rounded-lg " + 
-                (selected === index ? "bg-blue-50" : "")}>
-                  <span>
-                    {link.icon}
-                  </span>
-                  <span className="ml-3.5">
-                    {link.text}
-                  </span>
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
-      </div>
+    <div>
+      <ul className="flex flex-row">
+        {_.map(links, (link) => {
+          return (
+            <li className="list-item" key={randomString(4)}>
+              <Link to={link.pathname} onClick={() => setPathname(link.pathname)}
+              className={"flex items-center justify-center w-36 py-2 " + (pathname === link.pathname ? "border-b-4 border-black":"")}>
+                <span>{link.icon}</span>
+                <span className="pl-4">{link.text}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 };
