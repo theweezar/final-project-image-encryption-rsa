@@ -1,25 +1,35 @@
 import _ from 'lodash';
 import { FiUpload } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import { setActionTypeDefault } from '../scripts/redux/actions/actions';
+import { setActionAddFiles } from '../scripts/redux/actions/actions';
 import { Navigator } from './Navigator';
 
 export const Header = () => {
 
   const dispatch = useDispatch();
-  const stateFiles = useSelector(state => state.files);
+  const stateFileObjects = useSelector(state => state.files);
 
   const onUploadImage = (e) => {
-    var uploadedfiles = [...e.target.files];
-    _.forEach(uploadedfiles, uploadedFile => {
-      var found = _.find(stateFiles, stateFile => {
-        return stateFile.name === uploadedFile.name
+    var uploadedFiles = [...e.target.files];
+    var uploadedFilesObjectArray = [];
+    // Loop through to check if there is a duplicate image in the array
+    _.forEach(uploadedFiles, uploadedFile => {
+      var found = _.find(stateFileObjects, stateFileObj => {
+        return stateFileObj.file.name === uploadedFile.name
       });
-      if (found) {
-        alert('Duplicate image');
+      if (!found) {
+        // Push a image object into array
+        uploadedFilesObjectArray.push({
+          file: uploadedFile,
+          checked: false
+        });
       }
     });
-    dispatch(setActionTypeDefault(uploadedfiles));
+    if (uploadedFiles.length !== uploadedFilesObjectArray.length) {
+      alert('Duplicate images');
+    }
+    e.target.value = "";
+    dispatch(setActionAddFiles(uploadedFilesObjectArray));
   };
 
   return (
