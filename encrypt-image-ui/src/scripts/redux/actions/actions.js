@@ -1,8 +1,13 @@
+/**
+ * Set action for anything
+ * @param {any} currentState Any
+ * @returns {Object} Type Object
+ */
 export function setActionTypeDefault(currentState) {
   return {
     type: currentState
   };
-}
+};
 
 /**
  * Set action to add file to store
@@ -47,4 +52,30 @@ export const setActionCheckAllFiles = (checked) => {
       checked: checked
     }
   };
+};
+
+/**
+ * Set action to delete all checked files
+ * @returns {Object} Type Object
+ */
+export const setActionDeleteCheckedFiles = () => {
+  return {
+    type: {
+      deleteFiles: true
+    }
+  }; 
+};
+
+/**
+ * Set action to preview image
+ * @param {File} image File Object
+ * @returns {Object} Type Object
+ */
+export const setActionPreviewFiles = image => {
+  return {
+    type: {
+      preview: true,
+      image: image
+    }
+  }
 };

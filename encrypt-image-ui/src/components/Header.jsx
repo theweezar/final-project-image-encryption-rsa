@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import { FiUpload } from 'react-icons/fi';
+import { AiOutlineDelete } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
-import { setActionAddFiles } from '../scripts/redux/actions/actions';
+import { setActionAddFiles, setActionDeleteCheckedFiles } from '../scripts/redux/actions/actions';
 import { Navigator } from './Navigator';
 
 export const Header = () => {
@@ -32,11 +33,24 @@ export const Header = () => {
     dispatch(setActionAddFiles(uploadedFilesObjectArray));
   };
 
+  const onDeleteCheckedImage = () => {
+    dispatch(setActionDeleteCheckedFiles());
+  }
+
   return (
     <header>
       <div className="header flex items-center">
         <Navigator />
-        <div className="ml-auto">
+        <div className="ml-auto flex">
+          <button htmlFor="upload-images"
+          className="bg-red-500 text-white px-4 py-1.5 rounded border border-solid mr-4
+          border-red-500 flex items-center hover:bg-red-700 transition duration-200 cursor-pointer"
+          onClick={onDeleteCheckedImage}>
+            <span>
+              <AiOutlineDelete />
+            </span>
+            <span className="ml-2">Delete</span>
+          </button>
           <label htmlFor="upload-images"
           className="bg-blue-600 text-white px-4 py-1.5 rounded border border-solid 
           border-blue-600 flex items-center hover:bg-blue-700 transition duration-200 cursor-pointer">

@@ -2,10 +2,11 @@ import _ from "lodash";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { randomString } from "../scripts/randomHelpers";
-import { setActionCheckFiles, setActionCheckAllFiles } from "../scripts/redux/actions/actions";
+import { setActionCheckFiles, setActionCheckAllFiles, setActionPreviewFiles } from "../scripts/redux/actions/actions";
+import axios from "axios";
 
 const convertKbToMb = size => {
-  return (parseInt(size, 10) / 1024 / 1024).toFixed(2);
+  return (parseInt(size, 10) / 1024 / 1024);
 }
 
 const FileItem = ({ fileObject, index }) => {
@@ -18,28 +19,86 @@ const FileItem = ({ fileObject, index }) => {
     setChecked(!checked);
   }
 
+  const onPreviewImage = () => {
+    dispatch(setActionPreviewFiles(fileObject.file));
+  }
+
   return (
     <tr className={"border-b border-gray-300 hover:bg-gray-200 " + (checked ? "bg-gray-100":"")}>
       <td className="py-2.5 text-center">
         <input type="checkbox" name="selected" id={"file_" + index}
         checked={checked ? "checked":""} onChange={onChange} />
       </td>
-      <td className="cursor-pointer py-2.5">
+      <td className="cursor-pointer py-2.5" onClick={onPreviewImage}>
         {fileObject.file.name}
       </td>
-      <td className="text-center py-2.5">
-        {convertKbToMb(fileObject.file.size) + "MB"}
+      <td className="cursor-pointer text-right py-2.5 pr-4" onClick={onPreviewImage}>
+        {convertKbToMb(fileObject.file.size).toFixed(2) + "MB"}
       </td>
     </tr>
   );
 };
+
+const PreviewAction = () => {
+  const stateFileObjects = useSelector(state => state.files);
+
+  var totalSize = 0;
+  _.forEach(stateFileObjects, stateFileObj => {
+    totalSize += convertKbToMb(stateFileObj.file.size)
+  });
+
+  const onUploadEncrypt = () => {
+    const form = new FormData();
+    form.append('name', 'uploaded-files');
+    _.forEach(stateFileObjects, stateFileObj => {
+      form.append('file', stateFileObj.file);
+    });
+    axios.post(
+      'http://127.0.0.1:5000/upload_encrypt',
+      form,
+      {
+        headers: "Content-Type: multipart/form-data"
+      }
+    ).then(res => {
+      console.log(res);
+    }).catch(error => {
+      console.error(error);
+    });
+  };
+
+  return (
+    <div className="flex mt-4">
+      <div className="preview">
+        <span className="font-bold">File count: </span>
+        {stateFileObjects.length}
+        <span className="font-bold ml-4">Total size: </span>
+        {totalSize.toFixed(2) + 'MB'}
+      </div>
+      <div className="ml-auto">
+        <div>
+          <button className="bg-gray-500 text-white px-4 py-1.5 rounded border border-solid
+          border-gray-500 flex items-center hover:bg-gray-700 transition duration-200 cursor-pointer"
+          onClick={onUploadEncrypt}>
+            Encrypt
+          </button>
+        </div>
+        <div>
+          <button className="bg-gray-500 text-white px-4 py-1.5 rounded border border-solid mt-2
+          border-gray-500 flex items-center hover:bg-gray-700 transition duration-200 cursor-pointer">
+            Decrypt
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export const Landing = () => {
 
   const [checkedAll, setCheckedAll] = useState(false);
   const stateFileObjects = useSelector(state => state.files);
   const dispatch = useDispatch();
-  console.log(stateFileObjects);
+  // console.log(stateFileObjects);
 
   const onCheckAll = () => {
     setCheckedAll(!checkedAll);
@@ -48,7 +107,10 @@ export const Landing = () => {
 
   return (
     <div className="body">
-      <div className="file-list flex flex-wrap h-full overflow-y-auto">
+      <div>
+        <h1 className="text-4xl mb-2 font-bold">Files</h1>
+      </div>
+      <div className="file-list flex flex-wrap h-4/6 overflow-y-auto">
         <div className="table-container">
           <table className="table-fixed w-full border-collapse">
             <thead>
@@ -58,7 +120,7 @@ export const Landing = () => {
                   onChange={onCheckAll} />
                 </th>
                 <th className="w-4/5 text-left py-2.5">File name</th>
-                <th className="w-auto py-2.5">Size</th>
+                <th className="w-auto text-right py-2.5 pr-4">Size</th>
               </tr>
             </thead>
             <tbody>
@@ -70,10 +132,8 @@ export const Landing = () => {
             </tbody>
           </table>
         </div>
-        <div className="image-preview">
-
-        </div>
       </div>
+      <PreviewAction />
     </div>
   );
 };

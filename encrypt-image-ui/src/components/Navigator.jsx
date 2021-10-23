@@ -1,7 +1,6 @@
 import _ from "lodash";
 import { Link } from "react-router-dom";
 import { AiOutlineHome } from "react-icons/ai";
-import { GrTransaction } from "react-icons/gr";
 import { BsKey } from "react-icons/bs";
 import { randomString } from "../scripts/randomHelpers";
 import { useState } from "react";
@@ -11,8 +10,7 @@ export const Navigator = () => {
 
   const links = [
     {pathname: "/", icon: <AiOutlineHome />, text: "Landing"},
-    {pathname: "/keypair", icon: <BsKey />, text: "Keys"},
-    {pathname: "/actions", icon: <GrTransaction />, text: "Actions"},
+    {pathname: "/keypair", icon: <BsKey />, text: "Keys"}
   ];
 
   return (
