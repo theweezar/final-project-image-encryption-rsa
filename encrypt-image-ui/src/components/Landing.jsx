@@ -1,9 +1,11 @@
 import _ from "lodash";
+import axios from "axios";
+import configs from "../configs/configs.json";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { randomString } from "../scripts/randomHelpers";
 import { setActionCheckFiles, setActionCheckAllFiles, setActionPreviewFiles } from "../scripts/redux/actions/actions";
-import axios from "axios";
+
 
 const convertKbToMb = size => {
   return (parseInt(size, 10) / 1024 / 1024);
@@ -49,15 +51,17 @@ const PreviewAction = () => {
 
   const onUploadEncrypt = () => {
     const form = new FormData();
-    form.append('name', 'uploaded-files');
     _.forEach(stateFileObjects, stateFileObj => {
-      form.append('file', stateFileObj.file);
+      form.append('file[]', stateFileObj.file);
     });
     axios.post(
-      'http://127.0.0.1:5000/upload_encrypt',
+      configs.API_HOST + '/upload_encrypt',
       form,
       {
-        headers: "Content-Type: multipart/form-data"
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Access-Control-Allow-Origin": "*"
+        }
       }
     ).then(res => {
       console.log(res);

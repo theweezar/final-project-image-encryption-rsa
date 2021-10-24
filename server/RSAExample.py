@@ -1,5 +1,4 @@
-import math
-import File
+import FileHelpers
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 # Public-Key Cryptography Standards 1 (PKCS1) ver 1.5
 from Crypto.Random import get_random_bytes
@@ -12,17 +11,6 @@ from Crypto.Random import get_random_bytes
 PUBLIC_KEY_FILENAME = "public_key.bin"
 PRIVATE_KEY_FILENAME = "private_key.bin"
 
-def gcd(a: int, b: int):
-    return a if b == 0 else gcd(b, a % b)
-
-def isPrime(n: int):
-    sqrt_n = math.sqrt(n)
-    print('sqrt_n: ', sqrt_n)
-    for i in range(2, int(sqrt_n)):
-        if n % i == 0:
-            return False
-    return True
-
 def generate_key_pairs(key_length_bits):
     list_key_length = [1024, 2048, 4096]
     if key_length_bits not in list_key_length:
@@ -32,11 +20,11 @@ def generate_key_pairs(key_length_bits):
     public_key = key.publickey().exportKey('DER')
     private_key = key.exportKey('DER')
 
-    File.write_bin(PUBLIC_KEY_FILENAME, public_key)
-    File.write_bin(PRIVATE_KEY_FILENAME, private_key)
+    FileHelpers.write_bin(PUBLIC_KEY_FILENAME, public_key)
+    FileHelpers.write_bin(PRIVATE_KEY_FILENAME, private_key)
 
 def import_key(file_name: str):
-    key_bin, status = File.read_bin(file_name)
+    key_bin, status = FileHelpers.read_bin(file_name)
     try:
         return None if status == 1 else RSA.import_key(key_bin)
     except:

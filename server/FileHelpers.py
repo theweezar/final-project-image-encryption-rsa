@@ -1,3 +1,5 @@
+from werkzeug.datastructures import FileStorage
+
 def write(file_name: str, input_data):
     input_file = open(file_name, "w+")
     input_file.write(input_data)
@@ -30,3 +32,6 @@ def read_bin(file_name: str):
     except:
         status = 1
     return output_bin, status
+
+def read_stream_file(file: FileStorage):
+    return file.stream.read()
