@@ -1,5 +1,6 @@
 import math
 import random
+import numpy as np
 
 tiny_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71
 , 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181
@@ -14,6 +15,31 @@ tiny_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 6
 
 def gcd(a: int, b: int):
     return a if b == 0 else gcd(b, a % b)
+
+def euclidean_gcd(a: int, b: int):
+    # a = 23, b = 107
+    if a == 0:
+        return (b, 0, 1)
+    else:
+        g, y, x = euclidean_gcd(b % a, a)
+        return (g, x - (b // a) * y, y)
+
+def find_mod_inverse(a: int, m: int):
+    """Return -1 if mod invertse can not be found"""
+    g, x, y = euclidean_gcd(a, m)
+    if g != 1:
+        return -1
+    else:
+        return x % m
+
+def loop_find_mod_inverse(a: int, m: int):
+    # a = 3, m = 20 | a x a^-1 mod m = 1
+    a_inverse = 1
+
+    while (a * a_inverse) % m != 1:
+        a_inverse += 1
+
+    return a_inverse 
 
 def is_prime(n: int):
     """Version sqrt to check if the number is prime or not"""
@@ -46,13 +72,14 @@ def miller_rabin(num: int):
         m /= 2
         s += 1
     m = int(m)
-    print("s =", s)
+
+    print("\ns =", s)
     print("m =", m)
     print("num - 1 = (2^s) x m")
     print(f"{num} - 1 ({num - 1})= (2^{s}) x {m} ({(2**s) * m})")
 
     a = random.randrange(2, num - 1)
-    print("a =", a)
+    print("\na =", a)
     b = a ** m % num
     print(f"b = (a**m) % num = ({a} ** {m}) % {num} =", b)
     
@@ -60,7 +87,7 @@ def miller_rabin(num: int):
         return True
     
     for i in range(0, s):
-        print("Loop :", i)
+        # print("Loop :", i)
         if b == num - 1:
             return True
         b = b ** 2 % num
@@ -84,24 +111,3 @@ def generate_large_prime(key_length):
         num = random_with_length(key_length)
         if is_big_prime(num):
             return num
-
-def main():
-    key_length = 16
-
-    p = generate_large_prime(key_length)
-    q = generate_large_prime(key_length)
-
-    n = p*q
-
-    phi = (p - 1)*(q - 1)
-
-    e = 0
-    while True:
-        e = random_with_length(key_length)
-        if gcd(e, phi) == 1:
-            break
-
-    print(f"p = {p}, q = {q}, n = {n}, phi = {phi}, e = {e}")
-
-if __name__ == "__main__":
-    main()
