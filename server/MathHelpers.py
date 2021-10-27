@@ -23,10 +23,12 @@ def is_prime(n: int):
             return False
     return True
 
+def random_with_length(length: int):
+    return random.randrange(2 ** (length - 1), 2 ** (length))
 
 def miller_rabin(num: int):
-    """Algorithm used to check if the input is prime or not 
-    (Use for big number like 2^1024 and above)
+    """ # Algorithm used to check if the input is prime or not 
+    # (Use for big number like 2^1024 and above)
     1. n - 1 = (2^s) x m. Find s and m
     2. a = random(2, num - 1)
     3. b = a^m % num
@@ -47,12 +49,12 @@ def miller_rabin(num: int):
     print("s =", s)
     print("m =", m)
     print("num - 1 = (2^s) x m")
-    print(f"{num} - 1 = (2^{s}) x {m}")
+    print(f"{num} - 1 ({num - 1})= (2^{s}) x {m} ({(2**s) * m})")
 
     a = random.randrange(2, num - 1)
     print("a =", a)
     b = a ** m % num
-    print(f"b = a**m % num = {a} ** {m} % {num} =", b)
+    print(f"b = (a**m) % num = ({a} ** {m}) % {num} =", b)
     
     if b == 1:
         return True
@@ -66,7 +68,7 @@ def miller_rabin(num: int):
     return False
 
 def is_big_prime(num: int):
-    """Version to check a big big number if it is prime or not"""
+    """ Version to check a big big number if it is prime or not"""
     if num in tiny_primes:
         return True
     
@@ -79,10 +81,27 @@ def is_big_prime(num: int):
 def generate_large_prime(key_length):
     """Generate a big prime with size: 1024, 2048, 3072, 4096"""
     while True:
-        num = random.randrange(2 ** (key_length-1), 2 ** (key_length))
+        num = random_with_length(key_length)
         if is_big_prime(num):
             return num
-    
 
-big_prime = generate_large_prime(16)
-print("Big prime :", big_prime)
+def main():
+    key_length = 16
+
+    p = generate_large_prime(key_length)
+    q = generate_large_prime(key_length)
+
+    n = p*q
+
+    phi = (p - 1)*(q - 1)
+
+    e = 0
+    while True:
+        e = random_with_length(key_length)
+        if gcd(e, phi) == 1:
+            break
+
+    print(f"p = {p}, q = {q}, n = {n}, phi = {phi}, e = {e}")
+
+if __name__ == "__main__":
+    main()
