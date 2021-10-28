@@ -64,7 +64,7 @@ class Keypair:
                 self.__make_pem_key("PUBLIC KEY", self.__public_key),
                 self.__make_pem_key("PRIVATE KEY", self.__private_key)
             )
-        return (self.__public_key, self.__private_key)
+        return self.__public_key, self.__private_key
 
     def __parse_key(self, key: str):
         key = key.replace("\n", "")
@@ -99,7 +99,7 @@ class Keypair:
 
 
 if __name__ == "__main__":
-    keypair = Keypair(1024)
+    keypair = Keypair(16)
 
     public_key, private_key = keypair.get_key_pair()
 

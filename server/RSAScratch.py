@@ -1,10 +1,7 @@
 import math
 import FileHelpers
 import MathHelpers
+import base64
+import zlib
+from Keypair import Keypair
 
-primes = []
-for i in range(2, 1000):
-    if MathHelpers.is_prime(i):
-        primes.append(i)
-
-print(primes)

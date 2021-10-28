@@ -1,6 +1,7 @@
-from flask import Flask, request, make_response, jsonify
-from Crypto.PublicKey import RSA
+from flask import Flask, request
+from Keypair import Keypair
 from flask_cors import CORS
+import response as res
 import FileHelpers
 
 app = Flask(__name__)
@@ -13,27 +14,27 @@ def index():
 @app.route("/getkey", methods = ["GET"])
 def get_key():
     key_length_bits = request.args["key-length-bits"]
-    key = RSA.generate(key_length_bits)
-    public_key = key.publickey().exportKey("DER")
-    private_key = key.exportKey("DER")
+    keypair = Keypair(int(key_length_bits))
+    public_key, private_key = keypair.get_key_pair()
+    return res.json({
+        "success": True,
+        "public_key": public_key,
+        "private_key": private_key
+    })
+
 
 @app.route("/upload_encrypt", methods = ["POST"])
 def upload_encrypt():
     files = request.files.getlist("file[]")
-    app.logger.info(files)
+    # app.logger.info(files)
     for file in files:
-        FileHelpers.write_bin(file.filename, file.stream.read())
-    res = make_response(
-        jsonify(
-            {
-                "success" : True,
-                "file_count": len(files)
-            }
-        ),
-        200
-    )
-    res.headers.add("Content-Type", "application/json")
-    return res
+        file_ndarray = FileHelpers.read_stream_file_to_numpy(file)
+        app.logger.info(file_ndarray.shape)
+        FileHelpers.save_numpy_to_image("test2.jpg", file_ndarray)
+    return res.json({
+        "success" : True,
+        "file_count": len(files)
+    })
 
 @app.route("/upload_decrypt", methods = ["POST"])
 def upload_decrypt():
