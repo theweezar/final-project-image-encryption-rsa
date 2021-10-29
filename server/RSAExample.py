@@ -2,6 +2,7 @@ import FileHelpers
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 # Public-Key Cryptography Standards 1 (PKCS1) ver 1.5
 from Crypto.Random import get_random_bytes
+from matplotlib import image
 
 """
     Library
@@ -30,9 +31,9 @@ def import_key(file_name: str):
     except:
         return None
 
-def encrypt(public_key: RSA.RsaKey, plain_data: str):
+def encrypt(public_key: RSA.RsaKey, plain_data: bytes):
     cipher = PKCS1_v1_5.new(public_key)
-    return cipher.encrypt(plain_data.encode())
+    return cipher.encrypt(plain_data)
 
 def decrypt(private_key: RSA.RsaKey, cipher_data: bytes):
     cipher = PKCS1_v1_5.new(private_key)
@@ -40,10 +41,11 @@ def decrypt(private_key: RSA.RsaKey, cipher_data: bytes):
     return cipher.decrypt(cipher_data, sentinel)
     
 if __name__ == "__main__": 
-    # generate_key_pairs(1024)
+    # generate_key_pairs(4096)
     public_key = import_key(PUBLIC_KEY_FILENAME)
     private_key = import_key(PRIVATE_KEY_FILENAME)
-    cipher_text = encrypt(public_key, 'Hoang Phan Minh Duc')
+    image_ndarray = image.imread("images/test.jpg")
+    cipher_text = encrypt(public_key, image_ndarray.tobytes())
     print('\nCipher text: ', cipher_text)
-    plain_text= decrypt(private_key, cipher_text)
-    print('\nPlain text: ', plain_text.decode())
+    # plain_text= decrypt(private_key, cipher_text)
+    # print('\nPlain text: ', plain_text.decode())

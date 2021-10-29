@@ -7,6 +7,7 @@ class Keypair:
     def __init__(self, key_length = 0) -> None:
         self.__public_key = None
         self.__private_key = None
+        self.__modulus_n = None
         if type(key_length) == int and key_length > 0:
             self.key_length = key_length
             self.__generate_rsa_keypairs()
@@ -43,6 +44,7 @@ class Keypair:
                 # Private
                 self.__public_key = e
                 self.__private_key = d
+                self.__modulus_n = n
 
     def __make_pem_key(self, title: str, key: int):
         """Generate PEM data"""
@@ -95,6 +97,9 @@ class Keypair:
 
     def get_private_key_prime(self):
         return self.__private_key
+
+    def get_modulus_n(self):
+        return self.__modulus_n
 
 
 

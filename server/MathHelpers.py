@@ -111,3 +111,6 @@ def generate_large_prime(key_length):
         num = random_with_length(key_length)
         if is_big_prime(num):
             return num
+
+def convert_numpy_dtype(ndarray: np.ndarray, dtype: type) -> np.ndarray:
+    return ndarray.astype(dtype=dtype)
