@@ -19,7 +19,7 @@ def decrypt(data: Union[int, np.ndarray], keypair: Keypair) -> Union[int, np.nda
 
 def main():
     image_ndarray8 = image.imread("images/test.jpg")
-    image_ndarray64 = MathHelpers.convert_numpy_dtype(image_ndarray8, np.uint24)
+    image_ndarray64 = MathHelpers.convert_numpy_dtype(image_ndarray8, np.uint64)
     
     keypair = Keypair(1024)
     
@@ -37,15 +37,17 @@ def main():
     print("rgb_join:",rgb_join[0])
     print(rgb_join.dtype)
 
-    encrypted = encrypt(12345678910111213141516171819, keypair)
+    name = "Hoang Phan Minh Duc"
+
+    encrypted = encrypt(number.bytes_to_long(name.encode()), keypair)
 
     print("Encrypted:", encrypted)
-    print("Decrypted:", decrypt(encrypted, keypair))
 
-    name = "Hoang Phan Minh Duc"
-    print(number.bytes_to_long(name.encode()))
+    decrypted = decrypt(encrypted, keypair)
 
-    print(int.from_bytes(name.encode(), byteorder="big"))
+    print("Decrypted:", number.long_to_bytes(decrypted))
+    
+    print()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 import math
 import random
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.image as image
 
 tiny_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71
 , 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181
@@ -114,3 +116,35 @@ def generate_large_prime(key_length):
 
 def convert_numpy_dtype(ndarray: np.ndarray, dtype: type) -> np.ndarray:
     return ndarray.astype(dtype=dtype)
+
+def convert_image_ndarray_to_long_ndarray(image_ndarray: np.ndarray) -> np.ndarray:
+    """Convert a ndarray of image which has 3 channels to a long ndarray"""
+    image_ndarray64 = convert_numpy_dtype(image_ndarray, np.uint64)
+
+    r = image_ndarray64[:,:,0]
+    g = image_ndarray64[:,:,1]
+    b = image_ndarray64[:,:,2]
+    
+    long_ndarray = (r << 16) + (g << 8) + b
+
+    return long_ndarray
+
+def convert_long_ndarray_to_image_ndarray(long_ndarray: np.ndarray) -> np.ndarray:
+    """Extract R,G,B channels from a long ndarray"""
+    r = long_ndarray >> 16
+    g = (long_ndarray - (r << 16)) >> 8
+    b = long_ndarray - (r << 16) - (g << 8)
+    return convert_numpy_dtype(np.dstack((r,g,b)), np.uint8)
+
+
+if __name__ == "__main__":
+    image_ndarray8 = image.imread("images/test.jpg")
+    long_ndarray = convert_image_ndarray_to_long_ndarray(image_ndarray8)
+    
+    convert_image = convert_long_ndarray_to_image_ndarray(long_ndarray)
+
+    print(convert_image.shape)
+
+    plt.imshow(convert_image)
+    plt.show()
+    
