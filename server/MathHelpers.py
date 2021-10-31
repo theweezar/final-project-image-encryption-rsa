@@ -1,8 +1,10 @@
 import math
 import random
+from typing import Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as image
+from Crypto.Util import number
 
 tiny_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71
 , 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181
@@ -136,15 +138,25 @@ def convert_long_ndarray_to_image_ndarray(long_ndarray: np.ndarray) -> np.ndarra
     b = long_ndarray - (r << 16) - (g << 8)
     return convert_numpy_dtype(np.dstack((r,g,b)), np.uint8)
 
+def extract_rgb_channels(image_ndarray: np.ndarray):
+    r = image_ndarray[:,:,0].astype(np.uint64)
+    g = image_ndarray[:,:,1].astype(np.uint64)
+    b = image_ndarray[:,:,2].astype(np.uint64)
+
+    return r, g, b
 
 if __name__ == "__main__":
     image_ndarray8 = image.imread("images/test.jpg")
+
     long_ndarray = convert_image_ndarray_to_long_ndarray(image_ndarray8)
     
     convert_image = convert_long_ndarray_to_image_ndarray(long_ndarray)
 
     print(convert_image.shape)
 
-    plt.imshow(convert_image)
-    plt.show()
+    print(number.bytes_to_long(long_ndarray[0,:].tobytes()))
+
+    # plt.imshow(convert_image)
+
+    # plt.show()
     

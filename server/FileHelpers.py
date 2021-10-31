@@ -28,7 +28,7 @@ def write_bin(file_name: str, input_data):
 
 def read_bin(file_name: str):
     """Read a binary file and return a result with a status number: 0: successfully, 1: failed"""
-    output_bin = ""
+    output_bin = b""
     status = 0
     try:
         output_file = open(file_name, "rb")
