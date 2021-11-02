@@ -2,6 +2,7 @@ from werkzeug.datastructures import FileStorage
 from io import BytesIO
 from PIL import Image
 import numpy as np
+import base64
 
 def write(file_name: str, input_data):
     input_file = open(file_name, "w+")
@@ -38,8 +39,9 @@ def read_bin(file_name: str):
         status = 1
     return output_bin, status
 
-def read_stream_file(file: FileStorage):
-    return file.stream.read()
+def read_stream_file_base64(file: FileStorage) -> bytes:
+    """Return a bytes string b'<file_name>|<file_base64_data>'"""
+    return f"{file.filename}|".encode() + base64.b64encode(file.stream.read())
 
 def read_stream_file_to_numpy(file: FileStorage) -> np.ndarray:
     file_bytes = file.stream.read()

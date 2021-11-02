@@ -26,11 +26,12 @@ def get_key():
 @app.route("/upload_encrypt", methods = ["POST"])
 def upload_encrypt():
     files = request.files.getlist("file[]")
-    # app.logger.info(files)
+    app.logger.info(f"Count: {len(files)}")
+
+    files_container = []
     for file in files:
-        file_ndarray = FileHelpers.read_stream_file_to_numpy(file)
-        app.logger.info(file_ndarray.shape)
-        FileHelpers.save_numpy_to_image("test2.jpg", file_ndarray)
+        file_read = FileHelpers.read_stream_file_base64(file)
+        files_container.append(file_read)
     return res.json({
         "success" : True,
         "file_count": len(files)

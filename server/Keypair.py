@@ -105,10 +105,10 @@ class Keypair:
     def import_private_key(self, private_key: str):
         self.__modulus_n_private, self.__private_key = self.__parse_key(private_key)
 
-    def get_public_key_prime(self) -> int:
+    def get_public_key_long(self) -> int:
         return self.__public_key
 
-    def get_private_key_prime(self) -> int:
+    def get_private_key_long(self) -> int:
         return self.__private_key
 
     def get_modulus_n_public(self) -> int:
@@ -123,7 +123,7 @@ class Keypair:
         FileHelpers.write(path + "private_key.txt", private_key)
 
 if __name__ == "__main__":
-    keypair = Keypair()
+    keypair = Keypair(1024)
 
     # public_key, private_key = keypair.get_key_pair()
 
@@ -131,10 +131,16 @@ if __name__ == "__main__":
 
     # keypair.save_key_file()
 
-    public_key_data, pub_stt = FileHelpers.read("public_key.txt")
-    private_key_data, pri_stt = FileHelpers.read("private_key.txt")
-    keypair.import_public_key(public_key_data)
-    keypair.import_private_key(private_key_data)
-    print("\nPublic key:", keypair.get_public_key_prime())
-    print("\nPrivate key:", keypair.get_private_key_prime())
-    print("\nCompare 2 modulus is:", keypair.get_modulus_n_private() == keypair.get_modulus_n_public())
+    # public_key_data, pub_stt = FileHelpers.read("public_key.txt")
+    # private_key_data, pri_stt = FileHelpers.read("private_key.txt")
+    # keypair.import_public_key(public_key_data)
+    # keypair.import_private_key(private_key_data)
+    # print("\nPublic key:", keypair.get_public_key_long())
+    # print("\nPrivate key:", keypair.get_private_key_long())
+    # print("\nCompare 2 modulus is:", keypair.get_modulus_n_private() == keypair.get_modulus_n_public())
+
+    print("Public key:", keypair.get_public_key_long())
+
+    print("Private key:", keypair.get_private_key_long())
+
+    print("Modulus:", keypair.get_modulus_n_public())
