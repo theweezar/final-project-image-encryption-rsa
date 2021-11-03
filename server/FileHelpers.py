@@ -1,6 +1,7 @@
 from werkzeug.datastructures import FileStorage
 from io import BytesIO
 from PIL import Image
+from zipfile import ZipFile, ZIP_DEFLATED
 import numpy as np
 import base64
 
@@ -39,9 +40,13 @@ def read_bin(file_name: str):
         status = 1
     return output_bin, status
 
-def read_stream_file_base64(file: FileStorage) -> bytes:
+def read_stream_file_base64_with_name(file: FileStorage) -> bytes:
     """Return a bytes string b'<file_name>|<file_base64_data>'"""
     return f"{file.filename}|".encode() + base64.b64encode(file.stream.read())
+
+def read_stream_file(file: FileStorage) -> bytes:
+    """Return a bytes string of stream file"""
+    return file.stream.read()
 
 def read_stream_file_to_numpy(file: FileStorage) -> np.ndarray:
     file_bytes = file.stream.read()
@@ -50,3 +55,23 @@ def read_stream_file_to_numpy(file: FileStorage) -> np.ndarray:
 def save_numpy_to_image(file_name: str, ndarray: np.ndarray):
     img = Image.fromarray(ndarray)
     img.save(file_name)
+
+def convert_list_image_to_zip_file(list_image: list):
+    """Convert list image to a zip file object store in buffer"""
+    zip_buffer = BytesIO()
+    zip_obj = ZipFile(zip_buffer, "w", ZIP_DEFLATED, False)
+
+    for image in list_image:
+        info = bytes(image).split(b"|")
+        if len(info) == 2:
+            file_name = info[0].decode()
+            file_data = info[1]
+            zip_obj.writestr(file_name, file_data)
+            print(f"Zipped {file_name}")
+
+    zip_obj.close()
+    
+    with open('config.zip', 'wb') as f:
+        f.write(zip_buffer.getvalue())
+
+    return zip_buffer

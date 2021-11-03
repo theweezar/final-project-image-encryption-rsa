@@ -11,9 +11,11 @@ const filesReducer = (state = [], action) => {
   var type = action.type;
 
   if (type.addFile) {
+    // Add files reducer
     var files = type.files;
     state = _.isArray(files) && !_.isEmpty(files) ? state.concat(files) : state;
   } else if (type.checkFile) {
+    // Check files reducer
     if (type.checkAll) {
       _.forEach(state, stateFileObj => {
         stateFileObj.checked = type.checked;
@@ -23,9 +25,10 @@ const filesReducer = (state = [], action) => {
       state[index].checked = type.checked;
     }
   } else if (type.deleteFiles) {
+    // Delete checked files
     state = _.filter(state, stateFileObj => {
       return !stateFileObj.checked;
-    })
+    });
   }
   
   return state;

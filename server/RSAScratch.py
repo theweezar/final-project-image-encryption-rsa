@@ -1,8 +1,8 @@
 import base64
 import FileHelpers
+import SystemHelpers
 from Crypto.Util import number
 from Keypair import Keypair
-import time
 
 # public_key = 166545539961254822273044515772174488280273924999499357126534558813374032667966322483242423850270581260099089487846242806895701849791660739292704504400279158325164490447653350310437422456812704751147871272454206003372304733850770935440979385663789650185404744254224436620457899190335959365340454730459059991039
 
@@ -66,14 +66,6 @@ def decrypt_to_file_array(encrypted_files_b64: bytes, keypair: Keypair):
 
     return decrypt_file_bytes_container
 
-def calculate_time_execute(callback):
-    start_time = time.time()
-    if callback is not None and type(callback).__name__ == "function":
-        callback()
-    else:
-        raise TypeError("Callback is not function")
-    print(f"\n--- {(time.time() - start_time)} seconds ---")
-
 def main():
     keypair = Keypair()
     public_key_data, stt1 = FileHelpers.read("public_key.txt")
@@ -112,7 +104,7 @@ def main():
 
         # print("\nDecrypted:", dec.decode() == image_file_b64.decode())
         
-    calculate_time_execute(execute)
+    SystemHelpers.calculate_time_execute(execute)
 
 
 if __name__ == "__main__":

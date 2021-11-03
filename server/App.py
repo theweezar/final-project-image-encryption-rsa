@@ -1,11 +1,10 @@
 from flask import Flask, request, send_file
-from werkzeug.datastructures import FileStorage
 from Keypair import Keypair
 from flask_cors import CORS
+from io import BytesIO
 import response as res
 import FileHelpers
 import RSAScratch
-from io import BytesIO
 
 app = Flask(__name__)
 CORS(app)
@@ -35,33 +34,42 @@ def get_key():
 @app.route("/upload_encrypt", methods = ["POST"])
 def upload_encrypt():
     files = request.files.getlist("file[]")
-    app.logger.info(f"Count: {len(files)}")
+    app.logger.info(f"Count encrypt files: {len(files)}")
 
     files_bytes_container = []
 
     for file in files:
-        file_read = FileHelpers.read_stream_file_base64(file)
+        file_read = FileHelpers.read_stream_file_base64_with_name(file)
         files_bytes_container.append(file_read)
 
-    decrypted_file_bytes = RSAScratch.encrypt_array_to_file(files_bytes_container, keypair)
-    # decrypted_file = FileStorage()
-
-    return send_file(
-        BytesIO(decrypted_file_bytes),
-        mimetype='text/plain;charset=UTF-8',
-        as_attachment=True,
-        attachment_filename='Encrypted.cry'
-    )
-
+    result_file_bytes = RSAScratch.encrypt_array_to_file(files_bytes_container, keypair)
+    
     # return res.json({
-    #     "success" : True,
-    #     "file_count": len(files),
-    #     "decrypted_file": decrypted_file
+    #     "success": True,
+    #     "message": "Encrypt all files successfully.",
+    #     "result_file_bytes": result_file_bytes.decode()
     # })
+    return send_file(BytesIO(result_file_bytes), attachment_filename="encrypted.cry", as_attachment=True)
 
 @app.route("/upload_decrypt", methods = ["POST"])
 def upload_decrypt():
-    return ""
+    files = request.files.getlist("file[]")
+    app.logger.info(f"Count decrypt files: {len(files)}")
+    
+    files_bytes_container = []
+
+    for file in files:
+        file_read = FileHelpers.read_stream_file(file)
+        files_bytes_container += RSAScratch.decrypt_to_file_array(file_read, keypair)
+
+    zip_buffer = FileHelpers.convert_list_image_to_zip_file(files_bytes_container)
+
+    return send_file(
+        zip_buffer,
+        attachment_filename="images.zip",
+        as_attachment=True,
+        mimetype='application/zip'
+    )
 
 if __name__ == "__main__":
     app.run(

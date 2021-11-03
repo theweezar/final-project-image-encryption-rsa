@@ -6,6 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { randomString } from "../scripts/randomHelpers";
 import { setActionCheckFiles, setActionCheckAllFiles, setActionPreviewFiles } from "../scripts/redux/actions/actions";
 
+const endPoint = {
+  1: "/upload_encrypt",
+  2: "/upload_decrypt"
+};
 
 const convertKbToMb = size => {
   return (parseInt(size, 10) / 1024 / 1024);
@@ -43,19 +47,40 @@ const FileItem = ({ fileObject, index }) => {
 
 const PreviewAction = () => {
   const stateFileObjects = useSelector(state => state.files);
+  const [status, setStatus] = useState({
+    success: undefined,
+    message: undefined
+  });
+  const [resultFile, setResultFile] = useState();
+  const [typeDownload, setTypeDownload] = useState();
 
   var totalSize = 0;
   _.forEach(stateFileObjects, stateFileObj => {
     totalSize += convertKbToMb(stateFileObj.file.size)
   });
 
-  const onUploadEncrypt = () => {
+  const setStatusMessage = (success, message) => {
+    setStatus({
+      success: success,
+      message: message
+    });
+  }
+
+  const onUpload = (endPointIndex) => {
+    setStatusMessage(false, "")
+    setResultFile(null)
+    if (stateFileObjects.length === 0) {
+      setStatusMessage(false, "File not found")
+      return;
+    }
     const form = new FormData();
     _.forEach(stateFileObjects, stateFileObj => {
       form.append('file[]', stateFileObj.file);
     });
+    // Validate files
+    // Call API to upload all files
     axios.post(
-      configs.API_HOST + '/upload_encrypt',
+      configs.API_HOST + endPoint[endPointIndex],
       form,
       {
         headers: {
@@ -65,30 +90,70 @@ const PreviewAction = () => {
       }
     ).then(res => {
       console.log(res);
+      var resMessage;
+      var success = true;
+      if (res.data) {
+        setResultFile(new Blob([res.data]));
+        setTypeDownload(endPointIndex);
+        resMessage = endPointIndex === 1 ? "Encrypt successfully" : "Decrypt successfully";
+      } else {
+        success = false;
+        resMessage = endPointIndex === 1 ? "Encrypt failed" : "Decrypt failed";
+      }
+      setStatusMessage(success, resMessage);
     }).catch(error => {
-      console.error(error);
+      var errorMessage = "An error has occurred in the server";
+      if (error.response) {
+        errorMessage = error.response.data
+      }
+      setStatusMessage(false, errorMessage);
     });
   };
+
+  const onDownloadResultFile = () => {
+    console.log(resultFile)
+    const url = URL.createObjectURL(resultFile);
+    const a = document.createElement("a");
+    a.href = url;
+    if (typeDownload === 1) {
+      a.download = `encrypted_packet_${randomString(8)}.cry`
+    } else if (typeDownload === 2) {
+      a.download = `image_packet_${randomString(8)}.zip`
+    }
+    a.click();
+  }
 
   return (
     <div className="flex mt-4">
       <div className="preview">
-        <span className="font-bold">File count: </span>
-        {stateFileObjects.length}
-        <span className="font-bold ml-4">Total size: </span>
-        {totalSize.toFixed(2) + 'MB'}
+        <div>
+          <span className="font-bold">File count: </span>
+          {stateFileObjects.length}
+          <span className="font-bold ml-4">Total size: </span>
+          {totalSize.toFixed(2) + 'MB'}
+        </div>
+        <div className="flex items-center mt-2 text-xl font-bold">
+          <span className={status.success ? "text-green-500":"text-red-600"}>
+            {status.message}
+          </span>
+          <span onClick={onDownloadResultFile}
+          className={"cursor-pointer ml-2 underline text-blue-700 " + (resultFile ? "":"hidden")}>
+            Click here to download file
+          </span>
+        </div>
       </div>
       <div className="ml-auto">
         <div>
           <button className="bg-gray-500 text-white px-4 py-1.5 rounded border border-solid
           border-gray-500 flex items-center hover:bg-gray-700 transition duration-200 cursor-pointer"
-          onClick={onUploadEncrypt}>
+          onClick={() => onUpload(1)}>
             Encrypt
           </button>
         </div>
         <div>
           <button className="bg-gray-500 text-white px-4 py-1.5 rounded border border-solid mt-2
-          border-gray-500 flex items-center hover:bg-gray-700 transition duration-200 cursor-pointer">
+          border-gray-500 flex items-center hover:bg-gray-700 transition duration-200 cursor-pointer"
+          onClick={() => onUpload(2)}>
             Decrypt
           </button>
         </div>
