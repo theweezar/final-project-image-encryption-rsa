@@ -79,3 +79,32 @@ export const setActionPreviewFiles = image => {
     }
   }
 };
+
+/**
+ * Set action to check if page is making ajax call to upload file
+ * @param {boolean} isUploaded Is upload or not
+ * @returns {Object} Type Object
+ */
+export const setActionUploadFilesToProcess = isUploaded => {
+  return {
+    type: {
+      uploaded: isUploaded
+    }
+  }
+};
+
+export const setActionUploadPublicKey = (publicKeyFile) => {
+  return {
+    type: {
+      publicKeyFile: publicKeyFile
+    }
+  }
+};
+
+export const setActionUploadPrivateKey = (privateKeyFile) => {
+  return {
+    type: {
+      privateKeyFile: privateKeyFile
+    }
+  }
+};

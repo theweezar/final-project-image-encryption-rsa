@@ -58,20 +58,24 @@ def save_numpy_to_image(file_name: str, ndarray: np.ndarray):
 
 def convert_list_image_to_zip_file(list_image: list):
     """Convert list image to a zip file object store in buffer"""
+    # Create an empty buffer
     zip_buffer = BytesIO()
-    zip_obj = ZipFile(zip_buffer, "w", ZIP_DEFLATED, False)
 
-    for image in list_image:
-        info = bytes(image).split(b"|")
-        if len(info) == 2:
-            file_name = info[0].decode()
-            file_data = info[1]
-            zip_obj.writestr(file_name, file_data)
-            print(f"Zipped {file_name}")
+    # Init zip file object in above buffer
+    with ZipFile(zip_buffer, "w", ZIP_DEFLATED, False) as zip_obj:
 
-    zip_obj.close()
-    
-    with open('config.zip', 'wb') as f:
-        f.write(zip_buffer.getvalue())
+        for image in list_image:
+            info = bytes(image).split(b"|")
+            if len(info) == 2:
+                file_name = info[0].decode()
+                file_data = info[1]
+                with zip_obj.open(file_name, "w") as image_file:
+                    image_file.write(base64.b64decode(file_data))
+                print(f"Zipped {file_name}")
+
+    # with open('config.zip', 'wb') as f:
+    #     f.write(zip_buffer.getvalue())
+
+    zip_buffer.seek(0)
 
     return zip_buffer

@@ -1,7 +1,8 @@
+
 export const Veil = () => {
   return (
-    <div>
-
+    <div className="relative">
+      
     </div>
-  )
+  );
 };

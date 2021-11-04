@@ -1,9 +1,62 @@
 import _ from 'lodash';
 import { FiUpload } from 'react-icons/fi';
-import { AiOutlineDelete } from 'react-icons/ai';
+import { AiOutlineDelete, AiOutlineDownload } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActionAddFiles, setActionDeleteCheckedFiles } from '../scripts/redux/actions/actions';
 import { Navigator } from './Navigator';
+import { useState } from 'react';
+import { randomString } from '../scripts/randomHelpers';
+import { useDetectClickOutside } from 'react-detect-click-outside';
+
+const SelectKeyLength = () => {
+
+  const [isDropDown, setIsDropDown] = useState(false);
+
+  const keyLengths = [
+    {length: 1024, text: "1024 bits"},
+    {length: 2048, text: "2048 bits"},
+    {length: 3072, text: "3072 bits"},
+    {length: 4096, text: "4096 bits"},
+  ]
+
+  const ref = useDetectClickOutside({ onTriggered: () => {
+    setIsDropDown(false);
+  } });
+
+  const onClickGenerateAndDownloadKeyPair = (length) => {
+    console.log(length);
+    setIsDropDown(!isDropDown);
+  }
+
+  return (
+    <div className="mr-4" ref={ref}>
+      <button className="bg-yellow-500 text-white px-4 py-1.5 rounded border border-solid
+      border-yellow-500 flex items-center hover:bg-yellow-700 transition duration-200 cursor-pointer"
+      onClick={() => setIsDropDown(!isDropDown)}>
+        <span>
+          <AiOutlineDownload />
+        </span>
+        <span className="ml-2">Generate keypair</span>
+      </button>
+      <div className={"relative " + (isDropDown ? "" : "hidden")}>
+        <div className="absolute w-full mt-1">
+          <ul className="flex flex-col list-none w-full bg-white z-30 border border-gray-500 rounded">
+            {_.map(keyLengths, (keyLength) => {
+              return (
+                <li className="list-item" key={randomString(4)}>
+                  <div className="text-center px-4 py-1.5 cursor-pointer" 
+                  onClick={() => onClickGenerateAndDownloadKeyPair(keyLength.length)}>
+                    {keyLength.text}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export const Header = () => {
 
@@ -37,24 +90,13 @@ export const Header = () => {
     dispatch(setActionDeleteCheckedFiles());
   }
 
-  // const onDownloadCheckedFile = () => {
-
-  // }
-
   return (
     <header>
       <div className="header flex items-center">
         <Navigator />
         <div className="ml-auto flex">
 
-          {/* <button className="bg-green-500 text-white px-4 py-1.5 rounded border border-solid mr-4
-          border-green-500 flex items-center hover:bg-green-700 transition duration-200 cursor-pointer"
-          onClick={onDownloadCheckedFile}>
-            <span>
-              <AiOutlineDelete />
-            </span>
-            <span className="ml-2">Download</span>
-          </button> */}
+          <SelectKeyLength />
 
           <button className="bg-red-500 text-white px-4 py-1.5 rounded border border-solid mr-4
           border-red-500 flex items-center hover:bg-red-700 transition duration-200 cursor-pointer"

@@ -4,16 +4,13 @@ import configs from "../configs/configs.json";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { randomString } from "../scripts/randomHelpers";
-import { setActionCheckFiles, setActionCheckAllFiles, setActionPreviewFiles } from "../scripts/redux/actions/actions";
+import { convertKbToMb, isImageFile } from "../scripts/fileHelpers";
+import { setActionCheckFiles, setActionCheckAllFiles, setActionPreviewFiles, setActionUploadFilesToProcess } from "../scripts/redux/actions/actions";
 
 const endPoint = {
   1: "/upload_encrypt",
   2: "/upload_decrypt"
 };
-
-const convertKbToMb = size => {
-  return (parseInt(size, 10) / 1024 / 1024);
-}
 
 const FileItem = ({ fileObject, index }) => {
 
@@ -26,7 +23,14 @@ const FileItem = ({ fileObject, index }) => {
   }
 
   const onPreviewImage = () => {
-    dispatch(setActionPreviewFiles(fileObject.file));
+    if (fileObject.file) {
+      var fileName = fileObject.file.name;
+      if (isImageFile(fileName)) {
+        dispatch(setActionPreviewFiles(fileObject.file));
+      } else {
+        alert("Only preview image file");
+      }
+    }
   }
 
   return (
@@ -47,12 +51,14 @@ const FileItem = ({ fileObject, index }) => {
 
 const PreviewAction = () => {
   const stateFileObjects = useSelector(state => state.files);
+
   const [status, setStatus] = useState({
     success: undefined,
     message: undefined
   });
   const [resultFile, setResultFile] = useState();
   const [typeDownload, setTypeDownload] = useState();
+  const dispatch = useDispatch();
 
   var totalSize = 0;
   _.forEach(stateFileObjects, stateFileObj => {
@@ -73,11 +79,25 @@ const PreviewAction = () => {
       setStatusMessage(false, "File not found")
       return;
     }
+    // Validate uploaded file to correct crypt mode
+    var conflictFile = _.find(stateFileObjects, stateFileObj => {
+      return (isImageFile(stateFileObj.file.name) && endPointIndex === 2)
+      || (!isImageFile(stateFileObj.file.name) && endPointIndex === 1);
+    })
+    if (conflictFile) {
+      endPointIndex === 1 ? setStatusMessage(false, "Only encrypt image files") : setStatusMessage(false, "Only decrypt CRY files");
+      return;
+    }
+    // Init form data
+    dispatch(setActionUploadFilesToProcess(true));
     const form = new FormData();
     _.forEach(stateFileObjects, stateFileObj => {
-      form.append('file[]', stateFileObj.file);
+      if (stateFileObj.file) {
+        form.append('file[]', stateFileObj.file);
+      } else {
+        return;
+      }
     });
-    // Validate files
     // Call API to upload all files
     axios.post(
       configs.API_HOST + endPoint[endPointIndex],
@@ -86,7 +106,8 @@ const PreviewAction = () => {
         headers: {
           "Content-Type": "multipart/form-data",
           "Access-Control-Allow-Origin": "*"
-        }
+        },
+        responseType: "blob"
       }
     ).then(res => {
       console.log(res);
@@ -95,18 +116,20 @@ const PreviewAction = () => {
       if (res.data) {
         setResultFile(new Blob([res.data]));
         setTypeDownload(endPointIndex);
-        resMessage = endPointIndex === 1 ? "Encrypt successfully" : "Decrypt successfully";
+        resMessage = endPointIndex === 1 ? "Encrypt successfully." : "Decrypt successfully.";
       } else {
         success = false;
-        resMessage = endPointIndex === 1 ? "Encrypt failed" : "Decrypt failed";
+        resMessage = endPointIndex === 1 ? "Encrypt failed." : "Decrypt failed.";
       }
       setStatusMessage(success, resMessage);
+      dispatch(setActionUploadFilesToProcess(false));
     }).catch(error => {
-      var errorMessage = "An error has occurred in the server";
+      var errorMessage = "An error has occurred in the server.";
       if (error.response) {
-        errorMessage = error.response.data
+        errorMessage = error.response.data;
       }
       setStatusMessage(false, errorMessage);
+      dispatch(setActionUploadFilesToProcess(false));
     });
   };
 
@@ -145,14 +168,14 @@ const PreviewAction = () => {
       <div className="ml-auto">
         <div>
           <button className="bg-gray-500 text-white px-4 py-1.5 rounded border border-solid
-          border-gray-500 flex items-center hover:bg-gray-700 transition duration-200 cursor-pointer"
+          border-gray-500 flex items-center active:bg-gray-700 cursor-pointer"
           onClick={() => onUpload(1)}>
             Encrypt
           </button>
         </div>
         <div>
           <button className="bg-gray-500 text-white px-4 py-1.5 rounded border border-solid mt-2
-          border-gray-500 flex items-center hover:bg-gray-700 transition duration-200 cursor-pointer"
+          border-gray-500 flex items-center active:bg-gray-700 cursor-pointer"
           onClick={() => onUpload(2)}>
             Decrypt
           </button>

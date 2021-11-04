@@ -49,6 +49,7 @@ def upload_encrypt():
     #     "message": "Encrypt all files successfully.",
     #     "result_file_bytes": result_file_bytes.decode()
     # })
+    
     return send_file(BytesIO(result_file_bytes), attachment_filename="encrypted.cry", as_attachment=True)
 
 @app.route("/upload_decrypt", methods = ["POST"])
@@ -66,9 +67,8 @@ def upload_decrypt():
 
     return send_file(
         zip_buffer,
-        attachment_filename="images.zip",
-        as_attachment=True,
-        mimetype='application/zip'
+        attachment_filename="images_packet.zip",
+        as_attachment=True
     )
 
 if __name__ == "__main__":

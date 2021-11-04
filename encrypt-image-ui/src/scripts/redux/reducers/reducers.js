@@ -46,7 +46,32 @@ const previewImageReducer = (state = null, action) => {
   return state;
 }
 
+const isUploadToProcessReducer = (state = false, action) => {
+  var type = action.type;
+  state = (type && type.uploaded) ? type.uploaded : state;
+  return state;
+}
+
+const publicKeyFileReducer = (state = null, action) => {
+  var type = action.type;
+  if (type && type.publicKeyFile) {
+    state = type.publicKeyFile;
+  }
+  return state;
+}
+
+const privateKeyFileReducer = (state = null, action) => {
+  var type = action.type;
+  if (type && type.privateKeyFile) {
+    state = type.privateKeyFile;
+  }
+  return state;
+}
+
 export const allReducers = combineReducers({
   files: filesReducer,
-  previewImage: previewImageReducer
+  previewImage: previewImageReducer,
+  isUploadToProcess: isUploadToProcessReducer,
+  publicKeyFile: publicKeyFileReducer,
+  privateKeyFile: privateKeyFileReducer
 });
