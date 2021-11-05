@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { FiUpload } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +16,7 @@ const KeySection = ({ title, id, action, keyfile }) => {
     }
   }
 
+  // Read key file everytime render this component
   useEffect(() => {
     if (keyfile instanceof File) {
       const reader = new FileReader();
@@ -48,13 +48,13 @@ const KeySection = ({ title, id, action, keyfile }) => {
       <div className="flex items-center">
         <label htmlFor={id}
         className="bg-gray-500 text-white mt-4 px-4 py-1.5 rounded border border-solid border-gray-600 truncate
-        flex items-center justify-center w-1/2 mr-1 hover:bg-gray-600 transition duration-200 cursor-pointer">
+        flex items-center justify-center w-full mr-1 hover:bg-gray-600 transition duration-200 cursor-pointer">
           {!keyFileName ? keyEmptyContent() : keyFileName}
         </label>
-        <button className="bg-green-500 text-white mt-4 px-4 py-1.5 rounded border border-solid border-green-600
+        {/* <button className="bg-green-500 text-white mt-4 px-4 py-1.5 rounded border border-solid border-green-600
         flex items-center justify-center w-1/2 ml-1 hover:bg-green-600 transition duration-200 cursor-pointer">
           Download key
-        </button>
+        </button> */}
       </div>
       
 

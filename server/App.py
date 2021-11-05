@@ -19,17 +19,23 @@ keypair.import_private_key(private_key_data)
 def index():
     return "<p>Hello, World!</p>"
 
-@app.route("/getkey", methods = ["GET"])
+@app.route("/getkey", methods = ["POST"])
 def get_key():
-    key_length_bits = request.args["key-length-bits"]
-    keypair = Keypair(int(key_length_bits))
+    key_length = request.args["key_length"]
+    keypair = Keypair(int(key_length))
+    
     public_key, private_key = keypair.get_key_pair()
-    return res.json({
-        "success": True,
-        "public_key": public_key,
-        "private_key": private_key
-    })
 
+    # print("Public key:", public_key)
+    # print("Private key:", private_key)
+
+    keypair_zip_buffer = FileHelpers.convert_keypair_to_zip_file(public_key, private_key)
+    
+    return send_file(
+        keypair_zip_buffer,
+        attachment_filename="keypair.zip",
+        as_attachment=True
+    )
 
 @app.route("/upload_encrypt", methods = ["POST"])
 def upload_encrypt():

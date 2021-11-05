@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import axios from "axios";
+import configs from "../configs/configs.json";
 import { FiUpload } from 'react-icons/fi';
 import { AiOutlineDelete, AiOutlineDownload } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,9 +25,30 @@ const SelectKeyLength = () => {
     setIsDropDown(false);
   } });
 
-  const onClickGenerateAndDownloadKeyPair = (length) => {
-    console.log(length);
+  const onClickGenerateAndDownloadKeyPair = (keyLength) => {
+    console.log("Select key length to generate:", keyLength);
     setIsDropDown(!isDropDown);
+    axios.post(configs.API_HOST + "/getkey", null, {
+      params: {
+        key_length: keyLength
+      },
+      headers: {
+        "Access-Control-Allow-Origin": "*"
+      },
+      responseType: "blob"
+    }).then(res => {
+      console.log(res);
+      if (res.data) {
+        var keyFileLink = document.createElement("a");
+        const url = URL.createObjectURL(new Blob([res.data]));
+        keyFileLink.href = url;
+        keyFileLink.download = `keypair_${randomString(8)}.zip`;
+        keyFileLink.click();
+      }
+    }).catch(error => {
+      alert("error")
+      console.log(error);
+    });
   }
 
   return (

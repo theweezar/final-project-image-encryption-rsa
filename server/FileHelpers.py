@@ -4,6 +4,8 @@ from PIL import Image
 from zipfile import ZipFile, ZIP_DEFLATED
 import numpy as np
 import base64
+import random
+import string
 
 def write(file_name: str, input_data):
     input_file = open(file_name, "w+")
@@ -63,7 +65,6 @@ def convert_list_image_to_zip_file(list_image: list):
 
     # Init zip file object in above buffer
     with ZipFile(zip_buffer, "w", ZIP_DEFLATED, False) as zip_obj:
-
         for image in list_image:
             info = bytes(image).split(b"|")
             if len(info) == 2:
@@ -73,9 +74,49 @@ def convert_list_image_to_zip_file(list_image: list):
                     image_file.write(base64.b64decode(file_data))
                 print(f"Zipped {file_name}")
 
-    # with open('config.zip', 'wb') as f:
-    #     f.write(zip_buffer.getvalue())
+    zip_buffer.seek(0)
+
+    return zip_buffer
+
+def convert_keypair_to_zip_file(public_key: str, private_key: str):
+    """Convert keypair object into zip files"""
+    # Create an empty buffer
+    zip_buffer = BytesIO()
+
+    # Init zip file object in above buffer
+    with ZipFile(zip_buffer, "w", ZIP_DEFLATED, False) as zip_obj:
+
+        public_random = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        private_random = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+        with zip_obj.open(f"publickey_{public_random}.txt", "w") as publickey_file:
+            publickey_file.write(public_key.encode())
+        print("Zipped public key")
+
+        with zip_obj.open(f"privatekey_{private_random}.txt", "w") as privatekey_file:
+            privatekey_file.write(private_key.encode())
+        print("Zipped private key")
 
     zip_buffer.seek(0)
 
     return zip_buffer
+
+if __name__ == "__main__":
+    zip_buffer = BytesIO()
+
+    # Init zip file object in above buffer
+    with ZipFile(zip_buffer, "w", ZIP_DEFLATED, False) as zip_obj:
+
+        with zip_obj.open("publickey.txt", "w") as publickey_file:
+            publickey_file.write("public key here".encode())
+        print("Zipped public key")
+
+        with zip_obj.open("privatekey.txt", "w") as privatekey_file:
+            privatekey_file.write("private key here".encode())
+        print("Zipped private key")
+
+    zip_buffer.seek(0)
+
+    with open("test.zip", "wb+") as zip_file:
+        zip_file.write(zip_buffer.getvalue())
+    
