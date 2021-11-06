@@ -39,7 +39,7 @@ const FileItem = ({ fileObject, index }) => {
         <input type="checkbox" name="selected" id={"file_" + index}
         checked={checked ? "checked":""} onChange={onChange} />
       </td>
-      <td className="cursor-pointer py-2.5" onClick={onPreviewImage}>
+      <td className="cursor-pointer py-2.5 truncate" onClick={onPreviewImage}>
         {fileObject.file.name}
       </td>
       <td className="cursor-pointer text-right py-2.5 pr-4" onClick={onPreviewImage}>
@@ -51,6 +51,8 @@ const FileItem = ({ fileObject, index }) => {
 
 const PreviewAction = () => {
   const stateFileObjects = useSelector(state => state.files);
+  const publicKeyFileState = useSelector(state => state.publicKeyFile);
+  const privateKeyFileState = useSelector(state => state.privateKeyFile);
 
   const [status, setStatus] = useState({
     success: undefined,
@@ -75,9 +77,25 @@ const PreviewAction = () => {
   const onUpload = (endPointIndex) => {
     setStatusMessage(false, "")
     setResultFile(null)
+    const form = new FormData();
+    // Validate empty images
     if (stateFileObjects.length === 0) {
-      setStatusMessage(false, "File not found")
+      setStatusMessage(false, "File not found");
       return;
+    }
+    // Validate empty key
+    if (endPointIndex === 1 && !publicKeyFileState) {
+      setStatusMessage(false, "Public key file not found");
+      return;
+    } else {
+      form.append("public-key", publicKeyFileState)
+    }
+
+    if (endPointIndex === 2 && !privateKeyFileState) {
+      setStatusMessage(false, "Private key file not found");
+      return;
+    } else {
+      form.append("private-key", privateKeyFileState)
     }
     // Validate uploaded file to correct crypt mode
     var conflictFile = _.find(stateFileObjects, stateFileObj => {
@@ -88,9 +106,9 @@ const PreviewAction = () => {
       endPointIndex === 1 ? setStatusMessage(false, "Only encrypt image files") : setStatusMessage(false, "Only decrypt CRY files");
       return;
     }
-    // Init form data
+    // This action is used to trigger the loading spinner
     dispatch(setActionUploadFilesToProcess(true));
-    const form = new FormData();
+    // Add images to form data
     _.forEach(stateFileObjects, stateFileObj => {
       if (stateFileObj.file) {
         form.append('file[]', stateFileObj.file);
@@ -98,6 +116,7 @@ const PreviewAction = () => {
         return;
       }
     });
+    
     // Call API to upload all files
     axios.post(
       configs.API_HOST + endPoint[endPointIndex],
@@ -124,10 +143,11 @@ const PreviewAction = () => {
       setStatusMessage(success, resMessage);
       dispatch(setActionUploadFilesToProcess(false));
     }).catch(error => {
+      console.log(error.response);
       var errorMessage = "An error has occurred in the server.";
-      if (error.response) {
-        errorMessage = error.response.data;
-      }
+      // if (error.response) {
+      //   errorMessage = error.response.data;
+      // }
       setStatusMessage(false, errorMessage);
       dispatch(setActionUploadFilesToProcess(false));
     });

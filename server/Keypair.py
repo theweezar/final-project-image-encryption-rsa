@@ -95,7 +95,10 @@ class Keypair:
             key_data = base64.b64decode(b64_data.encode("utf-8")).decode("utf-8")
             key_data_split = key_data.split(self.__seperate)
             if len(key_data_split) == 2:
-                return int(key_data_split[0]), int(key_data_split[1])
+                modulus_n = key_data_split[0]
+                key_prime = key_data_split[1]
+                if modulus_n.isdigit() is True and key_prime.isdigit() is True:
+                    return int(modulus_n), int(key_prime)
 
         return None, None
 

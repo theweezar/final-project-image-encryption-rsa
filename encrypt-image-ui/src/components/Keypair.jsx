@@ -59,7 +59,7 @@ const KeySection = ({ title, id, action, keyfile }) => {
       
 
       <input type="file" name={id} id={id} className="hidden"
-      accept="*" onChange={onUploadKey} />
+      accept=".key" onChange={onUploadKey} />
     </>
   )
 }

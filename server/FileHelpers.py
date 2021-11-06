@@ -6,6 +6,7 @@ import numpy as np
 import base64
 import random
 import string
+import re
 
 def write(file_name: str, input_data):
     input_file = open(file_name, "w+")
@@ -58,6 +59,12 @@ def save_numpy_to_image(file_name: str, ndarray: np.ndarray):
     img = Image.fromarray(ndarray)
     img.save(file_name)
 
+def is_key_file(file: FileStorage) -> bool:
+    filename = file.filename
+    regex = re.compile("(.*)(.key)$")
+    print(regex.match(filename))
+    return regex.match(filename)
+
 def convert_list_image_to_zip_file(list_image: list):
     """Convert list image to a zip file object store in buffer"""
     # Create an empty buffer
@@ -89,11 +96,11 @@ def convert_keypair_to_zip_file(public_key: str, private_key: str):
         public_random = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
         private_random = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
-        with zip_obj.open(f"publickey_{public_random}.txt", "w") as publickey_file:
+        with zip_obj.open(f"publickey_{public_random}.key", "w") as publickey_file:
             publickey_file.write(public_key.encode())
         print("Zipped public key")
 
-        with zip_obj.open(f"privatekey_{private_random}.txt", "w") as privatekey_file:
+        with zip_obj.open(f"privatekey_{private_random}.key", "w") as privatekey_file:
             privatekey_file.write(private_key.encode())
         print("Zipped private key")
 
