@@ -1,10 +1,8 @@
 import math
 import random
-from typing import Tuple
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.image as image
-from Crypto.Util import number
+# import matplotlib.image as image
+# from Crypto.Util import number
 
 tiny_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71
 , 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181
@@ -73,19 +71,20 @@ def miller_rabin(num: int):
     s = 0
 
     while m % 2 == 0:
-        m /= 2
+        m = m // 2
         s += 1
     m = int(m)
 
-    print("\ns =", s)
-    print("m =", m)
-    print("num - 1 = (2^s) x m")
-    print(f"{num} - 1 ({num - 1})= (2^{s}) x {m} ({(2**s) * m})")
+    # print("\ns =", s)
+    # print("m =", m)
+    # print("num - 1 = (2^s) x m")
+    # print(f"{num} - 1 ({num - 1})= (2^{s}) x {m} ({(2**s) * m})")
 
     a = random.randrange(2, num - 1)
-    print("\na =", a)
-    b = a ** m % num
-    print(f"b = (a**m) % num = ({a} ** {m}) % {num} =", b)
+    # print("\na =", a)
+    # b = a ** m % num
+    b = pow(a, m, num)
+    # print(f"b = (a**m) % num = ({a} ** {m}) % {num} =", b)
     
     if b == 1:
         return True
@@ -94,7 +93,8 @@ def miller_rabin(num: int):
         # print("Loop :", i)
         if b == num - 1:
             return True
-        b = b ** 2 % num
+        # b = b ** 2 % num
+        b = pow(b, 2, num)
     
     return False
 
@@ -146,17 +146,15 @@ def extract_rgb_channels(image_ndarray: np.ndarray):
     return r, g, b
 
 if __name__ == "__main__":
-    image_ndarray8 = image.imread("images/test.jpg")
+    # image_ndarray8 = image.imread("images/test.jpg")
 
-    long_ndarray = convert_image_ndarray_to_long_ndarray(image_ndarray8)
+    # long_ndarray = convert_image_ndarray_to_long_ndarray(image_ndarray8)
     
-    convert_image = convert_long_ndarray_to_image_ndarray(long_ndarray)
+    # convert_image = convert_long_ndarray_to_image_ndarray(long_ndarray)
 
-    print(convert_image.shape)
+    # print(convert_image.shape)
 
-    print(number.bytes_to_long(long_ndarray[0,:].tobytes()))
+    # print(number.bytes_to_long(long_ndarray[0,:].tobytes()))
 
-    # plt.imshow(convert_image)
-
-    # plt.show()
+    print(generate_large_prime(2048))
     
