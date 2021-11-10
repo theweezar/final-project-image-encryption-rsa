@@ -16,7 +16,13 @@ tiny_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 6
 ]
 
 def gcd(a: int, b: int):
-    return a if b == 0 else gcd(b, a % b)
+    # return a if b == 0 else gcd(b, a % b)
+    while b != 0:
+        c = b
+        b = a % b
+        a = c
+
+    return a
 
 def euclidean_gcd(a: int, b: int):
     # a = 23, b = 107
@@ -52,6 +58,7 @@ def is_prime(n: int):
     return True
 
 def random_with_length(length: int):
+    """# Generate a random number with length"""
     return random.randrange(2 ** (length - 1), 2 ** (length))
 
 def miller_rabin(num: int):
@@ -157,4 +164,6 @@ if __name__ == "__main__":
     # print(number.bytes_to_long(long_ndarray[0,:].tobytes()))
 
     print(generate_large_prime(2048))
+
+    # print(gcd(484, 972))
     

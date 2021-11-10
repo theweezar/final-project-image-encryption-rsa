@@ -12,35 +12,28 @@ from Keypair import Keypair
 
 def encrypt(data_bytes: bytes, keypair: Keypair):
     track = 0
-    limit = 254
+    limit = keypair.get_limit_encrypt_length()
     stop = False
     enc_result = b""
     data_bytes_length = len(data_bytes)
-    print("\nPlain bytes length:", data_bytes_length)
 
     while stop is False:
         block_bytes = data_bytes[track: track + limit] if track + limit < data_bytes_length else data_bytes[track: data_bytes_length]
         stop = False if track + limit < data_bytes_length else True
         track += limit
         block_long = number.bytes_to_long(block_bytes)
-        if block_long < keypair.get_modulus_n_public():
-            enc_long = pow(block_long, keypair.get_public_key_long(), keypair.get_modulus_n_public())
-            enc_result += hex(enc_long).encode() + b";"
-        else:
-            raise ValueError("Message long integer is bigger than modulus")
+        enc_long = pow(block_long, keypair.get_public_key_long(), keypair.get_modulus_n_public())
+        enc_result += hex(enc_long).encode() + b";"
         
     return enc_result[:-1]
 
 def decrypt(data: bytes, keypair: Keypair):
     enc_blocks_long = data.split(b";")
     dec_result = b""
-    print("\nDecrypt will loop:", len(enc_blocks_long))
     
     for block_long_str in enc_blocks_long:
         dec_long = pow(int(block_long_str, 16), keypair.get_private_key_long(), keypair.get_modulus_n_private())
         dec_result += number.long_to_bytes(dec_long)
-
-    print("Decrypted to plain length:", len(dec_result))
 
     return dec_result
 

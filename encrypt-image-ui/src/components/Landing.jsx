@@ -145,10 +145,21 @@ const PreviewAction = () => {
     }).catch(error => {
       console.log(error.response);
       var errorMessage = "An error has occurred in the server.";
-      // if (error.response) {
-      //   errorMessage = error.response.data;
-      // }
-      setStatusMessage(false, errorMessage);
+      // Blob of JSON
+      if (error.response.data instanceof Blob) {
+        errorMessage = error.response.data;
+        const parseErrorMessage = async () => {
+          var errorResponse = JSON.parse(await error.response.data.text());
+          if (errorResponse.message) {
+            setStatusMessage(false, errorResponse.message);
+          } else {
+            setStatusMessage(false, errorMessage);
+          }
+        }
+        parseErrorMessage();
+      } else {
+        setStatusMessage(false, errorMessage);
+      }
       dispatch(setActionUploadFilesToProcess(false));
     });
   };
@@ -230,6 +241,10 @@ export const Landing = () => {
                 <th className="w-12 py-2.5">
                   <input type="checkbox" name="selected-all" id="selected-all"
                   onChange={onCheckAll} />
+                  {/* <div onClick={onCheckAll}
+                  className={"w-4 h-4 border border-black flex items-center justify-center cursor-pointer mx-auto " + (checkedAll ? 'bg-blue-700':'')}>
+                    <BiCheck className={checkedAll ? 'text-white':'text-transparent'} />
+                  </div> */}
                 </th>
                 <th className="w-4/5 text-left py-2.5">File name</th>
                 <th className="w-auto text-right py-2.5 pr-4">Size</th>

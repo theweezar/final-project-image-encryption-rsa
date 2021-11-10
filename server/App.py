@@ -15,22 +15,13 @@ CORS(app)
 # keypair.import_public_key(public_key_data)
 # keypair.import_private_key(private_key_data)
 
-@app.route("/")
-def index():
-    return "<p>Hello, World!</p>"
-
 @app.route("/getkey", methods = ["POST"])
 def get_key():
     key_length = request.args["key_length"]
     keypair = Keypair(int(key_length))
-    
+    keypair.print_bit_length()
     public_key, private_key = keypair.get_key_pair()
-
-    # print("Public key:", public_key)
-    # print("Private key:", private_key)
-
     keypair_zip_buffer = FileHelpers.convert_keypair_to_zip_file(public_key, private_key)
-    
     return send_file(
         keypair_zip_buffer,
         attachment_filename="keypair.zip",
@@ -47,7 +38,6 @@ def upload_encrypt():
     # Check key file format
     if FileHelpers.is_key_file(public_key_file) is None:
         return res.json({
-            "error": "Wrong key file format. Please import another key file.",
             "message": "Wrong key file format. Please import another key file."
         }, 500)
     
@@ -57,7 +47,6 @@ def upload_encrypt():
     # Check import key successfully or failed
     if keypair.get_modulus_n_public() is None or keypair.get_public_key_long() is None:
         return res.json({
-            "error": "Can't import this public key file. Please generate new key file and use it.",
             "message": "Can't import this public key file. Please generate new key file and use it."
         }, 500)
 
@@ -83,7 +72,6 @@ def upload_decrypt():
     # Check key fil format
     if FileHelpers.is_key_file(private_key_file) is None:
         return res.json({
-            "error": True,
             "message": "Wrong key file format. Please import another key file."
         }, 500)
 
@@ -92,7 +80,6 @@ def upload_decrypt():
     # Check import key successfully or failed
     if keypair.get_modulus_n_private() is None or keypair.get_private_key_long() is None:
         return res.json({
-            "error": True,
             "message": "Can't import this private key file. Please generate new key file and use it."
         }, 500)
 

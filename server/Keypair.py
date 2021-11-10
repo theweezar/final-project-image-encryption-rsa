@@ -23,12 +23,10 @@ class Keypair:
     def __generate_rsa_keypairs(self):
         found = False
         while found is False:
-            # print("Generate large prime p...")
             # p = MathHelpers.generate_large_prime(self.key_length)
-            p = number.getPrime(self.key_length)
-            # print("Generate large prime q...")
+            p = number.getPrime(self.key_length // 2)
             # q = MathHelpers.generate_large_prime(self.key_length)
-            q = number.getPrime(self.key_length)
+            q = number.getPrime(self.key_length // 2)
 
             n = p * q
 
@@ -37,10 +35,11 @@ class Keypair:
             e = 0
 
             while True:
-                e = number.getPrime(self.key_length)
+                e = number.getPrime(512)
                 if MathHelpers.gcd(e, phi) == 1:
                     break
 
+            # d * e % phi = 1
             d = MathHelpers.find_mod_inverse(e, phi)
 
             if d != -1:
@@ -82,9 +81,6 @@ class Keypair:
     def __parse_key(self, key: str):
         """Return a tuple with (modulus N, Key)"""
         key = key.replace("\n", "")
-        # ^(-----)(.*)(-----)(\w+)(-----)(.*)(-----)$
-        # ^(-----.*-----)(\w+)(-----.*-----)$
-        # ^(-----.*-----)(.*)(-----.*-----)$
         regex = re.compile("^(-----.*-----)(.*)(-----.*-----)$")
         split_array = regex.split(key)
         b64_data = None
@@ -120,13 +116,22 @@ class Keypair:
     def get_modulus_n_private(self) -> int:
         return self.__modulus_n_private
 
+    def get_limit_encrypt_length(self) -> int:
+        return (self.__modulus_n_public.bit_length() - 11) // 8
+
     def save_key_file(self, path = ""):
         public_key, private_key = self.get_key_pair()
         FileHelpers.write(path + "public_key.txt", public_key)
         FileHelpers.write(path + "private_key.txt", private_key)
 
+    def print_bit_length(self):
+        print("Public key:", self.get_public_key_long().bit_length())
+        print("Private key:", self.get_private_key_long().bit_length())
+        print("Modulus:", self.get_modulus_n_public().bit_length())
+
 if __name__ == "__main__":
-    keypair = Keypair(1024)
+    # 1024, 2048, 3072, 4096
+    keypair = Keypair(4096)
 
     # public_key, private_key = keypair.get_key_pair()
 
@@ -142,8 +147,4 @@ if __name__ == "__main__":
     # print("\nPrivate key:", keypair.get_private_key_long())
     # print("\nCompare 2 modulus is:", keypair.get_modulus_n_private() == keypair.get_modulus_n_public())
 
-    print("Public key:", keypair.get_public_key_long())
-
-    print("Private key:", keypair.get_private_key_long())
-
-    print("Modulus:", keypair.get_modulus_n_public())
+    keypair.print_bit_length()
