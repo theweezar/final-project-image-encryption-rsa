@@ -78,11 +78,13 @@ const PreviewAction = () => {
     setStatusMessage(false, "")
     setResultFile(null)
     const form = new FormData();
+    
     // Validate empty images
     if (stateFileObjects.length === 0) {
       setStatusMessage(false, "File not found");
       return;
     }
+
     // Validate empty key
     if (endPointIndex === 1 && !publicKeyFileState) {
       setStatusMessage(false, "Public key file not found");
@@ -97,6 +99,7 @@ const PreviewAction = () => {
     } else {
       form.append("private-key", privateKeyFileState)
     }
+
     // Validate uploaded file to correct crypt mode
     var conflictFile = _.find(stateFileObjects, stateFileObj => {
       return (isImageFile(stateFileObj.file.name) && endPointIndex === 2)
@@ -106,6 +109,7 @@ const PreviewAction = () => {
       endPointIndex === 1 ? setStatusMessage(false, "Only encrypt image files") : setStatusMessage(false, "Only decrypt CRY files");
       return;
     }
+
     // This action is used to trigger the loading spinner
     dispatch(setActionUploadFilesToProcess(true));
     // Add images to form data
