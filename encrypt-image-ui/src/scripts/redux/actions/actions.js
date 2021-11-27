@@ -88,7 +88,7 @@ export const setActionPreviewFiles = image => {
 export const setActionUploadFilesToProcess = isUploaded => {
   return {
     type: {
-      uploaded: isUploaded
+      isUploaded: isUploaded
     }
   }
 };

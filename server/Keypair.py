@@ -41,6 +41,7 @@ class Keypair:
 
             # d * e % phi = 1
             d = MathHelpers.find_mod_inverse(e, phi)
+            # d = MathHelpers.loop_find_mod_inverse_euclidean(phi, e)
 
             if d != -1:
                 found = True

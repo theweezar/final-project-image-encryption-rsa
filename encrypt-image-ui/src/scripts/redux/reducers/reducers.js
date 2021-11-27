@@ -48,7 +48,7 @@ const previewImageReducer = (state = null, action) => {
 
 const isUploadToProcessReducer = (state = false, action) => {
   var type = action.type;
-  state = (type && type.uploaded) ? type.uploaded : state;
+  state = (type && Object.prototype.hasOwnProperty.call(type, 'isUploaded')) ? type.isUploaded : state;
   return state;
 }
 

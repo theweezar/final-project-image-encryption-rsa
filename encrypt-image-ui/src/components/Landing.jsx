@@ -133,7 +133,7 @@ const PreviewAction = () => {
         responseType: "blob"
       }
     ).then(res => {
-      console.log(res);
+      // console.log(res);
       var resMessage;
       var success = true;
       if (res.data) {

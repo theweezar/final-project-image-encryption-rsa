@@ -6,8 +6,8 @@ export const Layout = ({ children }) => {
   return (
     <>
       <ImagePreview />
+      <Veil />
       <div className="max-w-screen-xl mx-auto px-5">
-        <Veil />
         <Header />
         {children}
       </div>

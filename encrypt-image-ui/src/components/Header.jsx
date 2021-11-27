@@ -4,7 +4,7 @@ import configs from "../configs/configs.json";
 import { FiUpload } from 'react-icons/fi';
 import { AiOutlineDelete, AiOutlineDownload } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
-import { setActionAddFiles, setActionDeleteCheckedFiles } from '../scripts/redux/actions/actions';
+import { setActionAddFiles, setActionDeleteCheckedFiles, setActionUploadFilesToProcess } from '../scripts/redux/actions/actions';
 import { Navigator } from './Navigator';
 import { useState } from 'react';
 import { randomString } from '../scripts/randomHelpers';
@@ -13,6 +13,7 @@ import { useDetectClickOutside } from 'react-detect-click-outside';
 const SelectKeyLength = () => {
 
   const [isDropDown, setIsDropDown] = useState(false);
+  const dispatch = useDispatch();
 
   const keyLengths = [
     {length: 1024, text: "1024 bits"},
@@ -25,9 +26,11 @@ const SelectKeyLength = () => {
     setIsDropDown(false);
   } });
 
+  // Click to generate the key pair
   const onClickGenerateAndDownloadKeyPair = (keyLength) => {
     console.log("Select key length to generate:", keyLength);
     setIsDropDown(!isDropDown);
+    dispatch(setActionUploadFilesToProcess(true));
     axios.post(configs.API_HOST + "/getkey", null, {
       params: {
         key_length: keyLength
@@ -45,9 +48,11 @@ const SelectKeyLength = () => {
         keyFileLink.download = `keypair_${randomString(8)}.zip`;
         keyFileLink.click();
       }
+      dispatch(setActionUploadFilesToProcess(false));
     }).catch(error => {
       alert("error")
       console.log(error);
+      dispatch(setActionUploadFilesToProcess(false));
     });
   }
 

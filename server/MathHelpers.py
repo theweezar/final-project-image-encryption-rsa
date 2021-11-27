@@ -30,11 +30,13 @@ def euclidean_gcd(a: int, b: int):
         return (b, 0, 1)
     else:
         g, y, x = euclidean_gcd(b % a, a)
+        print(g, y, x)
+        print(g, x - (b // a) * y, y)
         return (g, x - (b // a) * y, y)
 
 def find_mod_inverse(a: int, m: int):
-    """Return -1 if mod invertse can not be found"""
-    g, x, y = euclidean_gcd(a, m)
+    """Return -1 if mod inverse can not be found"""
+    g, x, y = euclidean_gcd(a, m)  
     if g != 1:
         return -1
     else:
@@ -47,7 +49,26 @@ def loop_find_mod_inverse(a: int, m: int):
     while (a * a_inverse) % m != 1:
         a_inverse += 1
 
-    return a_inverse 
+    return a_inverse
+
+def loop_find_mod_inverse_euclidean(a: int, b: int):
+    # a = 23, b = 107
+    av, bv = a, b
+    x0, y0 = 0, 1
+    x1, y1 = 1, 0 - (av // bv)
+    # print('av, bv, div, mod, x1, y1:', av, bv, a // b, a % b, x1, y1)
+    while av % (av % bv) != 0:
+        mod = av % bv
+        av = bv
+        bv = mod
+        div = av // bv
+        x3, y3 = x1, y1
+        x1, y1 = x0 - x1 * div, y0 - y1 * div
+        x0, y0 = x3, y3
+        # print('av, bv, div, mod, x1, y1:', av, bv, div, mod, x1, y1)
+    
+    return y1
+
 
 def is_prime(n: int):
     """Version sqrt to check if the number is prime or not"""
@@ -163,7 +184,15 @@ if __name__ == "__main__":
 
     # print(number.bytes_to_long(long_ndarray[0,:].tobytes()))
 
-    print(generate_large_prime(2048))
+    # print(generate_large_prime(2048))
 
     # print(gcd(484, 972))
+    
+    # print(find_mod_inverse(23, 107))
+
+    loop_find_mod_inverse_euclidean(973, 301)
+    loop_find_mod_inverse_euclidean(107, 23)
+    
+
+    
     

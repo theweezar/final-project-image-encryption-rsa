@@ -35,7 +35,7 @@ def upload_encrypt():
     keypair = Keypair()
     public_key_file = request.files["public-key"]
 
-    # Check key file format
+    # Check key file has name's format which is (.*)(.key)$
     if FileHelpers.is_key_file(public_key_file) is None:
         return res.json({
             "message": "Wrong key file format. Please import another key file."

@@ -62,7 +62,7 @@ def save_numpy_to_image(file_name: str, ndarray: np.ndarray):
 def is_key_file(file: FileStorage) -> bool:
     filename = file.filename
     regex = re.compile("(.*)(.key)$")
-    print(regex.match(filename))
+    # print(regex.match(filename))
     return regex.match(filename)
 
 def convert_list_image_to_zip_file(list_image: list):
