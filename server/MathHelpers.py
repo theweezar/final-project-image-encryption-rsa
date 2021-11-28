@@ -119,6 +119,7 @@ def miller_rabin(num: int):
     
     for i in range(0, s):
         # print("Loop :", i)
+        # X(s-1) mod num = -1 --> True
         if b == num - 1:
             return True
         # b = b ** 2 % num
