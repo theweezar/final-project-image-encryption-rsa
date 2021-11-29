@@ -87,19 +87,22 @@ def convert_list_image_to_zip_file(list_image: list):
 
 def convert_keypair_to_zip_file(public_key: str, private_key: str):
     """Convert keypair object into zip files"""
-    # Create an empty buffer
+    # Create an empty buffer in temp memory
     zip_buffer = BytesIO()
 
     # Init zip file object in above buffer
     with ZipFile(zip_buffer, "w", ZIP_DEFLATED, False) as zip_obj:
 
+        # Generate random value for keypair file name
         public_random = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
         private_random = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
+        # Create temp public key file in zip 
         with zip_obj.open(f"publickey_{public_random}.key", "w") as publickey_file:
             publickey_file.write(public_key.encode())
         print("Zipped public key")
 
+        # Create temp private key file in zip
         with zip_obj.open(f"privatekey_{private_random}.key", "w") as privatekey_file:
             privatekey_file.write(private_key.encode())
         print("Zipped private key")

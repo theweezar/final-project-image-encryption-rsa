@@ -30,8 +30,8 @@ def euclidean_gcd(a: int, b: int):
         return (b, 0, 1)
     else:
         g, y, x = euclidean_gcd(b % a, a)
-        print(g, y, x)
-        print(g, x - (b // a) * y, y)
+        # print(g, y, x)
+        # print(g, x - (b // a) * y, y)
         return (g, x - (b // a) * y, y)
 
 def find_mod_inverse(a: int, m: int):
@@ -66,9 +66,10 @@ def loop_find_mod_inverse_euclidean(a: int, b: int):
         x1, y1 = x0 - x1 * div, y0 - y1 * div
         x0, y0 = x3, y3
         # print('av, bv, div, mod, x1, y1:', av, bv, div, mod, x1, y1)
+
+    # print('mod inverse:', y1)
     
     return y1
-
 
 def is_prime(n: int):
     """Version sqrt to check if the number is prime or not"""
@@ -192,6 +193,7 @@ if __name__ == "__main__":
     # print(find_mod_inverse(23, 107))
 
     loop_find_mod_inverse_euclidean(973, 301)
+    
     loop_find_mod_inverse_euclidean(107, 23)
     
 

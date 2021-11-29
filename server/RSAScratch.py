@@ -1,6 +1,9 @@
 import base64
 import FileHelpers
 import SystemHelpers
+import datetime
+import re
+import time
 from Crypto.Util import number
 from Keypair import Keypair
 
@@ -10,6 +13,25 @@ from Keypair import Keypair
 
 # modulus_n = 13456838159611498905171223928174718166768510228976349734115794058861489416447358714051628242868276559203026620430414490716826087288871018945776145385958763255432056215769641666723623777036877779708633332485047246146949307556635797261180257724664430169853566131578732457623904039926841468366096180328301668265023936540532648790543690098749820091988503712862011591453048668154775170564144373849683639265219056874440560509051688171804488335285482421918082594897878197762990250761563378704826199875665092318457221285726868427829447745254127410029924893842413113672580331846025013436896087800577587154960601464623579203897
 
+def get_milli_seconds():
+    return int(time.time() * 1000)
+
+def make_unique_id():
+    today = datetime.date.today()
+    year = today.strftime('%Y')
+    month = today.strftime('%m')
+    day = today.strftime('%d')
+    milli_seconds = get_milli_seconds()
+    return base64.b64encode(f'encrypt{year}{month}{day}{milli_seconds}'.encode())
+
+def verify_unique_id(id: bytes):
+    try:
+        data_id = base64.b64decode(id)
+        unique_pattern = 'encrypt\d+'
+        return re.search(unique_pattern, data_id.decode())
+    except:
+        return None
+
 def encrypt(data_bytes: bytes, keypair: Keypair):
     track = 0
     limit = keypair.get_limit_encrypt_length()
@@ -18,10 +40,12 @@ def encrypt(data_bytes: bytes, keypair: Keypair):
     data_bytes_length = len(data_bytes)
 
     while stop is False:
+        # Split data into block of bytes
         block_bytes = data_bytes[track: track + limit] if track + limit < data_bytes_length else data_bytes[track: data_bytes_length]
         stop = False if track + limit < data_bytes_length else True
         track += limit
         block_long = number.bytes_to_long(block_bytes)
+        # x^public mod n = cipher then convert it to hex
         enc_long = pow(block_long, keypair.get_public_key_long(), keypair.get_modulus_n_public())
         enc_result += hex(enc_long).encode() + b";"
         
@@ -32,6 +56,7 @@ def decrypt(data: bytes, keypair: Keypair):
     dec_result = b""
     
     for block_long_str in enc_blocks_long:
+        # Convert hex to long int then use equation y^private mod n = plain
         dec_long = pow(int(block_long_str, 16), keypair.get_private_key_long(), keypair.get_modulus_n_private())
         dec_result += number.long_to_bytes(dec_long)
 
@@ -40,19 +65,23 @@ def decrypt(data: bytes, keypair: Keypair):
 def encrypt_array_to_file(list_of_files_b64: list, keypair: Keypair):
     """Encrypt a list of file and return just 1 encrypted file"""
     encrypt_file_bytes_container = b""
-
+    count = 0
     for file_b64 in list_of_files_b64:
         enc_file_b64 = encrypt(file_b64, keypair)
         encrypt_file_bytes_container += enc_file_b64 + b","
-
-    return encrypt_file_bytes_container + b"encrypted"
+        count += 1
+        print(f'Encrypted {count} file')
+    # Encode from bytes to base64
+    return base64.b64encode(encrypt_file_bytes_container + make_unique_id())
 
 def decrypt_to_file_array(encrypted_files_b64: bytes, keypair: Keypair):
     """Decrypt a file and return a list of plain files"""
     decrypt_file_bytes_container = []
-
-    encrypted_array_files_b64 = encrypted_files_b64.split(b",")
-    if encrypted_array_files_b64[-1] == b"encrypted":
+    # Decode from base64 to bytes
+    encrypt_files_bytes = base64.b64decode(encrypted_files_b64)
+    encrypted_array_files_b64 = encrypt_files_bytes.split(b",")
+    valid_id = verify_unique_id(encrypted_array_files_b64[-1])
+    if valid_id is not None:
         for file_b64 in encrypted_array_files_b64[:-1]:
             dec_file_b64 = decrypt(file_b64, keypair)
             decrypt_file_bytes_container.append(dec_file_b64)
@@ -101,4 +130,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    unique_id = make_unique_id()
+    valid = verify_unique_id(unique_id)
+    print(valid)

@@ -55,9 +55,9 @@ def upload_encrypt():
     files_bytes_container = []
 
     for file in files:
-        file_read = FileHelpers.read_stream_file_base64_with_name(file)
-        files_bytes_container.append(file_read)
-
+        file_read_bytes = FileHelpers.read_stream_file_base64_with_name(file)
+        files_bytes_container.append(file_read_bytes)
+    # Encrypt just one time, the result data is bytes
     result_file_bytes = RSAScratch.encrypt_array_to_file(files_bytes_container, keypair)
     
     return send_file(BytesIO(result_file_bytes), attachment_filename="encrypted.cry", as_attachment=True)
@@ -86,12 +86,17 @@ def upload_decrypt():
     app.logger.info(f"Count decrypt files: {len(files)}")
     
     files_bytes_container = []
+    try:
+        for file in files:
+            file_read_bytes = FileHelpers.read_stream_file(file)
+            # decrypt many time and concat the list result together
+            files_bytes_container += RSAScratch.decrypt_to_file_array(file_read_bytes, keypair)
 
-    for file in files:
-        file_read = FileHelpers.read_stream_file(file)
-        files_bytes_container += RSAScratch.decrypt_to_file_array(file_read, keypair)
-
-    zip_buffer = FileHelpers.convert_list_image_to_zip_file(files_bytes_container)
+        zip_buffer = FileHelpers.convert_list_image_to_zip_file(files_bytes_container)
+    except:
+        return res.json({
+            "message": "Can not decrypt. File has been damaged."
+        }, 500)
 
     return send_file(
         zip_buffer,

@@ -5,6 +5,7 @@ import { allReducers } from "./scripts/redux/reducers/reducers";
 import { Layout } from './components/layout/Layout';
 import { Landing } from "./components/Landing";
 import { Keypair } from "./components/Keypair";
+// import { History } from "./components/History";
 
 const store = createStore(
   allReducers,
@@ -22,6 +23,9 @@ function App() {
           <Route path="/keypair">
             <Keypair />
           </Route>
+          {/* <Route path="/history">
+            <History />
+          </Route> */}
         </Layout>
       </BrowserRouter>
     </Provider>

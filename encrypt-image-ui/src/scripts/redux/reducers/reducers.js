@@ -68,10 +68,19 @@ const privateKeyFileReducer = (state = null, action) => {
   return state;
 }
 
+const resultFileHistoryReducer = (state = [], action) => {
+  var type = action.type;
+  if (type && type.resultFile) {
+    state = state.push(type.resultFile)
+  }
+  return state;
+}
+
 export const allReducers = combineReducers({
   files: filesReducer,
   previewImage: previewImageReducer,
   isUploadToProcess: isUploadToProcessReducer,
   publicKeyFile: publicKeyFileReducer,
-  privateKeyFile: privateKeyFileReducer
+  privateKeyFile: privateKeyFileReducer,
+  resultFileHistory: resultFileHistoryReducer
 });

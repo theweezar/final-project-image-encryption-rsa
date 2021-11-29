@@ -118,6 +118,9 @@ class Keypair:
         return self.__modulus_n_private
 
     def get_limit_encrypt_length(self) -> int:
+        '''
+            11 bits padding
+        '''
         return (self.__modulus_n_public.bit_length() - 11) // 8
 
     def save_key_file(self, path = ""):

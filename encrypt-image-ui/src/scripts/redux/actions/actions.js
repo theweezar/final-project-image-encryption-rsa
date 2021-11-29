@@ -108,3 +108,11 @@ export const setActionUploadPrivateKey = (privateKeyFile) => {
     }
   }
 };
+
+export const setActionAddToHistory = (resultFile) => {
+  return {
+    type: {
+      resultFile: resultFile
+    }
+  }
+};
