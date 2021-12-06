@@ -32,11 +32,13 @@ def euclidean_gcd(a: int, b: int):
         g, y, x = euclidean_gcd(b % a, a)
         # print(g, y, x)
         # print(g, x - (b // a) * y, y)
+        # Avoid exception ZeroDivisionError: integer division or modulo by zero
         return (g, x - (b // a) * y, y)
+        # return (g, x % y, y)
 
 def find_mod_inverse(a: int, m: int):
     """Return -1 if mod inverse can not be found"""
-    g, x, y = euclidean_gcd(a, m)  
+    g, x, y = euclidean_gcd(a, m)
     if g != 1:
         return -1
     else:
@@ -108,11 +110,13 @@ def miller_rabin(num: int):
     # print("m =", m)
     # print("num - 1 = (2^s) x m")
     # print(f"{num} - 1 ({num - 1})= (2^{s}) x {m} ({(2**s) * m})")
-
+    # Random a: 1 < a < p
     a = random.randrange(2, num - 1)
     # print("\na =", a)
     # b = a ** m % num
-    b = pow(a, m, num)
+    # b = pow(a, m, num)
+    # Check a ^ (p - 1) === 1 (mod p)
+    b = pow(a, num - 1, num)
     # print(f"b = (a**m) % num = ({a} ** {m}) % {num} =", b)
     
     if b == 1:

@@ -150,20 +150,25 @@ const PreviewAction = () => {
       console.log(error.response);
       var errorMessage = "An error has occurred in the server.";
       // Blob of JSON
-      if (error.response.data instanceof Blob) {
-        errorMessage = error.response.data;
-        const parseErrorMessage = async () => {
-          var errorResponse = JSON.parse(await error.response.data.text());
-          if (errorResponse.message) {
-            setStatusMessage(false, errorResponse.message);
-          } else {
-            setStatusMessage(false, errorMessage);
+      if (error.response) {
+        if (error.response.data instanceof Blob) {
+          errorMessage = error.response.data;
+          const parseErrorMessage = async () => {
+            var errorResponse = JSON.parse(await error.response.data.text());
+            if (errorResponse.message) {
+              setStatusMessage(false, errorResponse.message);
+            } else {
+              setStatusMessage(false, errorMessage);
+            }
           }
+          parseErrorMessage();
+        } else {
+          setStatusMessage(false, errorMessage);
         }
-        parseErrorMessage();
       } else {
         setStatusMessage(false, errorMessage);
       }
+      
       dispatch(setActionUploadFilesToProcess(false));
     });
   };

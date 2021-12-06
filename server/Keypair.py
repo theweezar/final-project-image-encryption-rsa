@@ -18,15 +18,14 @@ class Keypair:
         self.__private_key = None
         self.__modulus_n_public = None
         self.__modulus_n_private = None
-        self.__is_generated = False
 
     def __generate_rsa_keypairs(self):
         found = False
         while found is False:
-            # p = MathHelpers.generate_large_prime(self.key_length)
-            p = number.getPrime(self.key_length // 2)
-            # q = MathHelpers.generate_large_prime(self.key_length)
-            q = number.getPrime(self.key_length // 2)
+            p = MathHelpers.generate_large_prime(self.key_length // 2)
+            # p = number.getPrime(self.key_length // 2)
+            q = MathHelpers.generate_large_prime(self.key_length // 2)
+            # q = number.getPrime(self.key_length // 2)
 
             n = p * q
 
@@ -35,14 +34,14 @@ class Keypair:
             e = 0
 
             while True:
-                e = number.getPrime(512)
+                # e = number.getPrime(512)
+                e = MathHelpers.generate_large_prime(512)
                 if MathHelpers.gcd(e, phi) == 1:
                     break
 
-            # d * e % phi = 1
+            # d * e === 1 (mod phi)
             d = MathHelpers.find_mod_inverse(e, phi)
-            # d = MathHelpers.loop_find_mod_inverse_euclidean(phi, e)
-
+            
             if d != -1:
                 found = True
 
@@ -56,7 +55,6 @@ class Keypair:
                 self.__private_key = d
                 self.__modulus_n_public = n
                 self.__modulus_n_private = n
-                self.__is_generated = True
 
     def __make_pem_key(self, title: str, modulus_n: int, key: int):
         """Generate PEM data"""
@@ -135,7 +133,7 @@ class Keypair:
 
 if __name__ == "__main__":
     # 1024, 2048, 3072, 4096
-    keypair = Keypair(4096)
+    keypair = Keypair(1024, verbose=True)
 
     # public_key, private_key = keypair.get_key_pair()
 
@@ -151,4 +149,4 @@ if __name__ == "__main__":
     # print("\nPrivate key:", keypair.get_private_key_long())
     # print("\nCompare 2 modulus is:", keypair.get_modulus_n_private() == keypair.get_modulus_n_public())
 
-    keypair.print_bit_length()
+    # keypair.print_bit_length()

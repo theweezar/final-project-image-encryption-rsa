@@ -42,7 +42,12 @@ def upload_encrypt():
         }, 500)
     
     app.logger.info("Importing public key...")
-    keypair.import_public_key(FileHelpers.read_stream_file(public_key_file).decode())
+    try:
+        keypair.import_public_key(FileHelpers.read_stream_file(public_key_file).decode())
+    except:
+        return res.json({
+            "message": "Can't import this public key file. Please generate new key file and use it."
+        }, 500)
 
     # Check import key successfully or failed
     if keypair.get_modulus_n_public() is None or keypair.get_public_key_long() is None:
@@ -75,8 +80,13 @@ def upload_decrypt():
             "message": "Wrong key file format. Please import another key file."
         }, 500)
 
-    keypair.import_private_key(FileHelpers.read_stream_file(private_key_file).decode())
-
+    try:
+        keypair.import_private_key(FileHelpers.read_stream_file(private_key_file).decode())
+    except:
+        return res.json({
+            "message": "Can't import this private key file. Please generate new key file and use it."
+        }, 500)
+    
     # Check import key successfully or failed
     if keypair.get_modulus_n_private() is None or keypair.get_private_key_long() is None:
         return res.json({
